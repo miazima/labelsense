@@ -1,0 +1,5 @@
+https://scotch.io/tutorials/build-a-restful-api-using-node-and-express-4
+
+https://scotch.io/tutorials/using-mongoosejs-in-node-js-and-mongodb-applications
+
+https://stormpath.com/blog/tutorial-build-rest-api-mobile-apps-using-node-js

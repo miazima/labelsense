@@ -1,0 +1,32 @@
+<link rel="import" href="bower_components/polymerfire/firebase-app.html">
+<link rel="import" href="./theme/default-theme.html">
+<link rel="import" href="./app-page.html">
+<link rel="import" href="./src/ls-login.html">
+
+<dom-module id="labelsense-app">
+	<template>
+		<style>
+			:host {
+				display: block;
+			}
+		</style>
+		
+
+		<firebase-app
+			id="firebase"
+			auth-domain="labelsense.firebaseapp.com"
+		  database-url="https://labelsense.firebaseio.com/"
+		  api-key="AIzaSyBIKI0ODwCeMNMbVCvDWgEUmIa1d2N1GP0">
+		</firebase-app>
+
+		<!-- <ls-login></ls-login> -->
+
+		<app-page></app-page>
+
+	</template>
+	<script>
+		Polymer({
+			is: 'labelsense-app'
+		});
+	</script>
+</dom-module>

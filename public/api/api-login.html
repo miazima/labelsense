@@ -1,0 +1,96 @@
+<link rel="import" href="../bower_components/polymer/polymer.html">
+<link rel="import" href="../bower_components/iron-ajax/iron-ajax.html">
+
+<link rel="import" href="./api-behavior.html">
+
+<dom-module id="api-signin">
+  <template>
+    <iron-ajax id="xhr"
+      url="[[url]]"
+      method="POST"
+      content-type="application/json"
+      handle-as="json"
+      body="[[_body]]"
+      params="[[_params]]"
+      loading="{{loading}}"
+      last-error="{{_ajaxError}}"
+      last-response="{{_results}}"></iron-ajax>
+  </template>
+
+  <script>
+    (function() {
+      'use strict';
+
+      Polymer({
+        is: 'api-signin',
+        behaviors: [
+          HiveOSS.ApiBehavior
+        ],
+        properties: {
+          /*
+           * Returns an Array<Object> representing the projects belonging to the user.
+           */
+          projects: {
+            type: Array,
+            notify: true,
+            readonly: true,
+            computed: '_get(_results.projects)'
+          },
+          /*
+           * Email of the account.
+           */
+          email: String,
+          /*
+           * uid of the account.
+           */
+          uid: String,
+          admin: Boolean,
+          signout: {
+            type: Boolean,
+            value: false
+          },
+          url: {
+            type: String,
+            value: 'api/users'
+          },
+          valid: {
+            type: Boolean,
+            notify: true,
+            computed: '_isValid(_params, _body)'
+          },
+          _body: {
+            type: Object,
+            computed: '_computeBody(email,uid,admin)'
+          },
+          _params: {
+            type: Object,
+            computed: '_computeParams(signout)'
+          }
+        },
+
+        _isValid: function(params, body) {
+          return (params || body) && true;
+        },
+
+        _computeBody: function(email, uid, admin) {
+          if (!email || !uid || !admin)
+            return;
+
+          console.log(email, uid, admin);
+
+          return {
+            email: email,
+            uid: uid,
+            admin: admin
+          };
+        },
+
+        _computeParams: function(signout) {
+          var params = Object.create(null);
+          if (signout) params.signout = 1;
+          return params;
+        }
+      });
+    })();
+  </script>
+</dom-module>
