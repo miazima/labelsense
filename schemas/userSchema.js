@@ -1,5 +1,3 @@
-// app/models/bear.js
-
 var mongoose     = require('mongoose');
 var Schema       = mongoose.Schema;
 
@@ -15,4 +13,4 @@ var userSchema   = new Schema({
     admin: Boolean
 });
 
-module.exports = mongoose.model('UserModel', userSchema);
+module.exports = mongoose.model('User', userSchema);
