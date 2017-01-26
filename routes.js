@@ -3,8 +3,8 @@
 var express = require('express');  
 var router = express.Router();              // get an instance of the express Router
 
-var DataSense = require('./dataSchema');
-var UserSchema = require('./userSchema');
+var DataSense = require('./schemas/dataSchema');
+var UserSchema = require('./schemas/userSchema');
 
 // middleware to use for all requests
 router.use(function(req, res, next) {
