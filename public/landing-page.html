@@ -1,0 +1,87 @@
+
+<dom-module id="landing-page">
+	<template>
+		<style>
+			:host {
+				display: block;
+			}
+      .tabs {
+        height: 100%;
+        @apply(--layout-horizontal);
+      }
+      .tabs > a {
+        @apply(--layout-vertical);
+        @apply(--layout-center-center);
+        margin: 12px 16px 12px;
+        border-bottom: 1px solid #222;
+      }
+      header {
+        @apply(--layout-vertical);
+        @apply(--layout-center-center);
+        height: calc(100vh - 128px);
+        padding: 0 16px;
+        background-color: var(--paper-teal-500);
+				background-image: radial-gradient(closest-side, transparent 98%, rgba(0,0,0,.02) 99%),
+				radial-gradient(closest-side, transparent 98%, rgba(0,0,0,.02) 99%);
+				background-size:80px 80px;
+				background-position:0 0, 40px 40px;
+        color: white;
+        text-align: center;
+      }
+      header > h2 {
+        font-size: 56px;
+        font-weight: 300;
+        margin: 0;
+      }
+      header > p {
+        font-size: 32px;
+      }
+      section {
+        padding: 88px 16px;
+      }
+			.border {
+				height: 64px;
+			}
+			paper-button.accent-btn {
+				padding: 12px 18px;
+				margin: 10px;
+				background: var(--paper-red-400);
+			}
+		</style>
+
+			<div class="border"></div>
+      <header>
+        <h2>Welcome To Our Landing Page</h2>
+        <paper-button class="accent-btn" raised>Sign in</paper-button>
+      </header>
+
+      <div class="border"></div>
+
+	</template>
+	<script>
+		Polymer({
+			is: 'landing-page',
+			properties: {
+			  animationConfig: {
+			    value: function() {
+			      return {
+			        // the outgoing page defines the 'exit' animation
+			        'exit': {
+			          name: 'hero-animation',
+			          id: 'hero',
+			          fromPage: this
+			        }
+			      }
+			    }
+			  },
+			  sharedElements: {
+			    value: function() {
+			      return {
+			        'hero': this.$.otherHero
+			      }
+			    }
+			  }
+			}
+		});
+	</script>
+</dom-module>
