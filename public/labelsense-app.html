@@ -16,12 +16,11 @@
 		</style>
 
 	  <app-location route="{{route}}" query-params="{{queryParams}}"></app-location>
-  	<app-route route="{{route}}" tail={{subroute}}></app-route>
+    <app-route route="{{route}}" pattern="/:section" data="{{routeData}}" tail="{{subroute}}"></app-route>
 
-  	<neon-animated-pages id="pages" selected="0">
-  		<landing-page></landing-page>
-			<app-page></app-page>
-
+  	<neon-animated-pages id="pages" selected="[[routeData.section]]" attr-for-selected="name" selected-attribute="visible">
+  		<landing-page name="landing" on-circle-click="_onCircleClick"></landing-page>
+			<app-page name="apppage"></app-page>
 <!--       <circles-page on-circle-click="_onCircleClick"></circles-page>
       <squares-page on-click="_onSquaresClick"></squares-page> -->
     </neon-animated-pages>
@@ -40,7 +39,26 @@
 	</template>
 	<script>
 		Polymer({
-			is: 'labelsense-app'
+			is: 'labelsense-app',
+			properties: {
+				routeData: Object
+				// selected: {
+				// 	type: String.
+				// 	value: 'landing'
+				// }
+			},
+			observer: [
+				'findroute(route)'
+			],
+			findroute: function(route) {
+				console.log(route);
+			},
+			_onCircleClick: function() {
+				 this.$.pages.selected = 1;
+			},
+			_onSquaresClick: function() {
+				 this.$.pages.selected = 0;
+			}
 		});
 	</script>
 </dom-module>
