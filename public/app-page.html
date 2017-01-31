@@ -6,6 +6,7 @@
 <link rel="import" href="bower_components/paper-item/paper-item.html">
 <link rel="import" href="bower_components/iron-icons/iron-icons.html">
 <link rel="import" href="bower_components/app-layout/app-layout.html">
+<link rel="import" href="./behaviors/route-behavior.html">
 <link rel="import" href="./src/ls-login.html">
 
 <dom-module id="app-page">
@@ -26,17 +27,20 @@
         color: white;
         padding-top: 8px;
       }
-    #analysisDropdown iron-dropdown.paper-menu-button {
-      color: red;
-    }
-    paper-menu-button {
-       --paper-menu-button-dropdown:{
-          width:200px;
-          top:64px !important;
-          right: 0px;
-          left: initial !important;
-        };
-    }
+      #settingsMenu paper-item {
+        cursor: pointer;
+      }
+      #analysisDropdown iron-dropdown.paper-menu-button {
+        color: red;
+      }
+      paper-menu-button {
+         --paper-menu-button-dropdown:{
+            width:200px;
+            top:64px !important;
+            right: 0px;
+            left: initial !important;
+          };
+      }
     </style>
 
     <firebase-auth
@@ -55,9 +59,9 @@
         <paper-menu-button vertical-align="top" horizontal-align="right" id="analysisDropdown">
           <paper-icon-button icon="settings" class="dropdown-trigger"></paper-icon-button>
           <paper-menu id="settingsMenu" class="dropdown-content">
-            <paper-item class="settingsHeader">Hello YOU<!-- [[user.displayName]] -->!</paper-item>
+            <paper-item class="settingsHeader">Hello [[user.displayName]]!</paper-item>
             <paper-item>App Settings</paper-item>
-            <paper-item hidden$="[[!user]]">Logout</paper-item>
+            <paper-item hidden$="[[!user]]" on-tap="logout">Logout</paper-item>
 <!--             <paper-item>Settings</paper-item>
             <paper-item>Help</paper-item> -->
           </paper-menu>
@@ -71,7 +75,8 @@
     Polymer({
       is: 'app-page',
       behaviors: [
-        Polymer.NeonSharedElementAnimatableBehavior
+        Polymer.NeonSharedElementAnimatableBehavior,
+        HiveOSS.RouteBehavior
       ],
       properties: {
         sharedElements: {
@@ -99,7 +104,9 @@
       },
 
       logout: function() {
+        this.routeToLandingPage();
         return this.$.auth.signOut();
+
       }
     });
   </script>

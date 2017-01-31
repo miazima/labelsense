@@ -1,4 +1,8 @@
 <link rel="import" href="bower_components/neon-animation/neon-shared-element-animatable-behavior.html">
+<link rel="import" href="bower_components/polymerfire/firebase-auth.html">
+<link rel="import" href="src/ls-login.html">
+<link rel="import" href="api/api-login.html">
+<link rel="import" href="./behaviors/route-behavior.html">
 
 <dom-module id="landing-page">
 	<template>
@@ -46,17 +50,35 @@
 			paper-button.accent-btn {
 				padding: 12px 18px;
 				background: var(--paper-teal-a700);
+				cursor: pointer;
+				@apply(--paper-font-button);
 			}
 			div#signin {
 				padding: 20px;
 			}
 		</style>
 
+		<firebase-auth
+			id="auth" 
+			user="{{user}}" 
+			status-known="{{statusKnown}}"
+			signed-in="{{signedIn}}"
+			provider="google">
+		</firebase-auth>
+
+		<api-signin 
+			id="apiSignIn"
+      email="[[user.email]]"
+      uid="[[user.uid]]"
+      admin="true"
+      on-success="_handleSignInSuccess">
+    </api-signin>
+
 			<div class="border"></div>
       <header id="landing">
         <h2>Welcome To Our Landing Page</h2>
         <div id="signin">
-        	<paper-button id="signinbtn" class="accent-btn" on-tap="heroEvent" raised>Sign in</paper-button>
+        	<paper-button id="signinbtn" class="accent-btn" on-tap="login" raised>Sign in</paper-button>
         </div>
       </header>
 
@@ -67,9 +89,21 @@
 		Polymer({
 			is: 'landing-page',
 			behaviors: [
-	      Polymer.NeonSharedElementAnimatableBehavior
+	      Polymer.NeonSharedElementAnimatableBehavior,
+        HiveOSS.RouteBehavior
 	    ],
 			properties: {
+				user: {
+					type: Object,
+					observer: 'userDetails'
+				},
+				statusKnown: {
+					type: Object
+				},
+				signedIn: {
+					type: Boolean,
+					observer: 'isAuthenticated'
+				},
 				sharedElements: {
           value: function() {
             return {
@@ -94,8 +128,23 @@
 	      }
 			},
 
-			heroEvent: function(event) {
-        this.fire('circle-click');
+			login: function() {
+				console.log('new login');
+				return this.$.auth.signInWithPopup();
+			},
+
+			userDetails: function(details) {
+				console.log(details);
+				if (details) {
+					this.routeToAppPage();
+				}
+			},
+
+			isAuthenticated:function(auth) {
+				if (auth) {
+					this.$.apiSignIn.generateRequest();
+					this.routeToAppPage();
+				}
 			}
 		});
 	</script>

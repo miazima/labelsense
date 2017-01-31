@@ -1,5 +1,4 @@
 <link rel="import" href="../bower_components/polymerfire/firebase-auth.html">
-<link rel="import" href="../bower_components/paper-button/paper-button.html">
 <link rel="import" href="../api/api-login.html">
 
 <dom-module id="ls-login">
@@ -27,13 +26,6 @@
       admin="true"
       on-success="_handleSignInSuccess">
     </api-signin>
-
-		<template is="dom-if" if="[[user]]">
-			<h1>Welcome [[user.displayName]]</h1>
-		</template>
-
-		<paper-button raised on-tap="login" hidden$="[[user]]">Sign in</paper-button>
-		<paper-button raised on-tap="logout" hidden$="[[!user]]">Sign out</paper-button>
 		
 	</template>
 	<script>
@@ -69,6 +61,7 @@
 			isAuthenticated:function(auth) {
 				if (auth) {
 					this.$.apiSignIn.generateRequest();
+					this.fire('circle-click');
 				}
 			}
 		});

@@ -3,13 +3,13 @@ var app        = express();                 // define app using express
 var bodyParser = require('body-parser');
 var mongoose   = require('mongoose');
 
-mongoose.connect('mongodb://localhost:27017/labelsense');
+// mongoose.connect('mongodb://localhost:27017/labelsense');
 
 
 
 app.use(express.static(__dirname + '/public'));
-app.get('/', function (req, res) {
-  res.send('index.html')
+app.get('/*', function (req, res) {
+	res.sendFile(__dirname + '/public' + '/index.html');
 })
 
 // configure app to use bodyParser()
