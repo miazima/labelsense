@@ -7,9 +7,14 @@ var mongoose   = require('mongoose');
 
 
 
-app.use(express.static(__dirname + '/public'));
+app.use(express.static(__dirname + '/app'));
+var router = require('./routes');
+
+// REGISTER OUR ROUTES -------------------------------
+// all of our routes will be prefixed with /api
+app.use('/api', router);
 app.get('/*', function (req, res) {
-	res.sendFile(__dirname + '/public' + '/index.html');
+	res.sendFile(__dirname + '/app' + '/index.html');
 })
 
 // configure app to use bodyParser()
@@ -19,11 +24,7 @@ app.use(bodyParser.json());
 
 var port = process.env.PORT || 8000;        // set our port
 
-var router = require('./routes');
 
-// REGISTER OUR ROUTES -------------------------------
-// all of our routes will be prefixed with /api
-app.use('/api', router);
 
 // START THE SERVER
 // =============================================================================
