@@ -1,0 +1,97 @@
+<link rel="import" href="../bower_components/hiveoss-dragdrop-box/hiveoss-dragdrop-box.html">
+<link rel="import" href="../bower_components/iron-collapse/iron-collapse.html">
+<link rel="import" href="../bower_components/paper-button/paper-button.html">
+<link rel="import" href="../bower_components/paper-input/paper-input.html">
+<link rel="import" href="../bower_components/iron-icons/iron-icons.html">
+<link rel="import" href="theme/shared-styles.html">
+
+<dom-module id="projects-component">
+	<template>
+		<style include="shared-styles">
+			:host {
+				display: block;
+			}
+	    hiveoss-dragdrop-box /deep/ #placeholder{
+        display: none !important;
+      }
+	    hiveoss-dragdrop-box#dragdrop {
+	    	@apply(--layout-flex-auto);
+        background: 50% 50% no-repeat url(assets/upload-over.png);
+        background-size: 25vh;
+        height: 25vh;
+	    }
+	    .paper-font-title {
+	      @apply(--paper-font-title);
+	      color: var(--paper-teal-900);
+	    }
+	    paper-button.uploadBtn {
+				padding: 12px 18px;
+				width: 35%;
+				background: var(--paper-indigo-500);
+				cursor: pointer;
+				color: white;
+				@apply(--paper-font-button);
+			}
+			.paper-textfield { width: 35%; }
+			.wrapper { height: 100%; }
+			.wrapper > * { padding: 15px; }
+		</style>
+		
+		<div class="wrapper layout vertical center-justified">			
+			<div>
+				<hiveoss-dragdrop-box id="dragdrop"
+		     form-data="{{formData}}"
+		     last-file="{{projectFile}}"
+		     on-form-data="_handleFileAdded">
+		    </hiveoss-dragdrop-box>
+			</div>
+
+      <div class="horizontal center-justified layout">
+    		<validator-projectname project-list=[[projectList]] property-name="[[validateProperty]]"></validator-projectname>
+	      <paper-input-container class="paper-textfield" auto-validate invalid="[[_invalidProjectName]]">
+	        <label>Analysis Name</label>
+	        <iron-a11y-keys id="a11y"
+	          target="[[targetProjectNameInput]]"
+	          keys="enter"
+	          on-keys-pressed="execute"></iron-a11y-keys>
+	        <input id="projNameTextBox" is="iron-input" bind-value="{{projectName}}"
+	                required
+	                auto-validate
+	                prevent-invalid-input
+	                invalid="{{_invalidProjectName}}"
+	                allowed-pattern="[a-zA-z0-9_]"
+	                autofocus="true"
+	                validator="validator-projectname"></input>
+	        <paper-input-error>Project name has already been used or empty</paper-input-error>
+	      </paper-input-container>
+    	</div>
+
+    	<div class="horizontal center-justified layout">
+    		<paper-button class="uploadBtn" raised on-tap="toggleUpload">Upload New Project
+				<iron-icon class="end-justified" icon="file-upload"></paper-button>
+    	</div>
+		</div>
+
+	</template>
+	<script>
+		Polymer({
+			is: 'projects-component',
+			properties: {
+				formData: Object,
+				projectFile: Object,
+				projectName: String,
+				_invalidProjectName: Boolean,
+				targetProjectNameInput: {
+          type: Object,
+          value: function() {
+            return this.$.projNameTextBox;
+          }
+        },
+			},
+
+			toggleUpload: function() {
+				this.$.collapse.toggle();
+			}
+		});
+	</script>
+</dom-module>
