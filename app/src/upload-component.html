@@ -5,7 +5,7 @@
 <link rel="import" href="../bower_components/iron-icons/iron-icons.html">
 <link rel="import" href="theme/shared-styles.html">
 
-<dom-module id="projects-component">
+<dom-module id="upload-component">
 	<template>
 		<style include="shared-styles">
 			:host {
@@ -20,17 +20,12 @@
         background-size: 25vh;
         height: 25vh;
 	    }
-	    .paper-font-title {
-	      @apply(--paper-font-title);
-	      color: var(--paper-teal-900);
-	    }
 	    paper-button.uploadBtn {
 				padding: 12px 18px;
 				width: 35%;
 				background: var(--paper-indigo-500);
 				cursor: pointer;
 				color: white;
-				@apply(--paper-font-button);
 			}
 			.paper-textfield { width: 35%; }
 			.wrapper { height: 100%; }
@@ -67,7 +62,7 @@
     	</div>
 
     	<div class="horizontal center-justified layout">
-    		<paper-button class="uploadBtn" raised on-tap="toggleUpload">Upload New Project
+    		<paper-button class="uploadBtn paper-font-button" raised on-tap="toggleUpload">Upload New Project
 				<iron-icon class="end-justified" icon="file-upload"></paper-button>
     	</div>
 		</div>
@@ -75,7 +70,7 @@
 	</template>
 	<script>
 		Polymer({
-			is: 'projects-component',
+			is: 'upload-component',
 			properties: {
 				formData: Object,
 				projectFile: Object,
