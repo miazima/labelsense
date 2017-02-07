@@ -1,0 +1,37 @@
+<link rel="import" href="../bower_components/polymer/polymer.html">
+<link rel="import" href="../bower_components/iron-validator-behavior/iron-validator-behavior.html">
+
+<script>
+  /*
+   * Custom iron-validator element to validate project name.
+   * Project name must be unique.
+   */
+  Polymer({
+    is: 'validator-projectname',
+    behaviors: [
+      Polymer.IronValidatorBehavior
+    ],
+    properties: {
+      projectList: {
+        type: Array
+      },
+      _projects: {
+        type: Array,
+        computed: '_computeProjects(projectList)'
+      }
+    },
+    _computeProjects: function(projectList) {
+      return projectList.map(function(d) {
+        return d.ProjectName;
+      });
+    },
+    /*
+     * Validate project name against a list of existing projects.
+     */
+    validate: function(val) {
+      // ensure no illegal characters
+      var _val = val.replace(/[^a-z0-9_-]/gi, '').toLowerCase();
+      return this._projects.indexOf(_val) < 0;
+    }
+  });
+</script>

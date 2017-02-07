@@ -3,8 +3,7 @@
 var express = require('express');  
 var router = express.Router();              // get an instance of the express Router
 
-var DataSense = require('./schemas/dataSchema');
-var UserSchema = require('./schemas/userSchema');
+var UserSchema = require('../schemas/userSchema');
 
 // middleware to use for all requests
 router.use(function(req, res, next) {
@@ -24,8 +23,7 @@ router.route('/users')
 
     // create a user (accessed at POST http://localhost:8080/api/users)
     .post(function(req, res) {
-        
-        var user = new User();      // create a new instance of the user model
+        var user = new UserSchema();      // create a new instance of the user model
         user.uid = req.body.uid;  // set the users name (comes from the request)
         user.email = req.body.email;
         user.admin = req.body.admin;
@@ -37,7 +35,6 @@ router.route('/users')
               err: err,
               message: 'UserSchema created!' });
         });
-        
     })
 
      // get all the users (accessed at GET http://localhost:8080/api/users)

@@ -3,6 +3,7 @@
 <link rel="import" href="../bower_components/paper-button/paper-button.html">
 <link rel="import" href="../bower_components/paper-input/paper-input.html">
 <link rel="import" href="../bower_components/iron-icons/iron-icons.html">
+<link rel="import" href="./validator-projectname.html">
 <link rel="import" href="theme/shared-styles.html">
 
 <dom-module id="upload-component">
@@ -28,21 +29,24 @@
 				color: white;
 			}
 			.paper-textfield { width: 35%; }
-			.wrapper { height: 100%; }
-			.wrapper > * { padding: 15px; }
 		</style>
 		
-		<div class="wrapper layout vertical center-justified">			
-			<div>
+		<div class="main-content-wrapper layout vertical center-justified">			
+			<div class="content-wrapper layout vertical">
 				<hiveoss-dragdrop-box id="dragdrop"
 		     form-data="{{formData}}"
 		     last-file="{{projectFile}}"
 		     on-form-data="_handleFileAdded">
 		    </hiveoss-dragdrop-box>
+		    <!--Uploaded file name -->
+	      <p id="selectedFile" class="self-center">
+	        <span class="upload-file-placeholder" hidden$="[[!noFileSelected]]">[[description]]</span>
+	        <span class="selected-file-info" hidden$="[[noFileSelected]]">[[projectFile.name]] | [[projectFile.size]] bytes</span>
+	      </p>
 			</div>
 
-      <div class="horizontal center-justified layout">
-    		<validator-projectname project-list=[[projectList]] property-name="[[validateProperty]]"></validator-projectname>
+      <div class="content-wrapper horizontal center-justified layout">
+    		<validator-projectname project-list=[[projectList]]></validator-projectname>
 	      <paper-input-container class="paper-textfield" auto-validate invalid="[[_invalidProjectName]]">
 	        <label>Analysis Name</label>
 	        <iron-a11y-keys id="a11y"
@@ -61,8 +65,8 @@
 	      </paper-input-container>
     	</div>
 
-    	<div class="horizontal center-justified layout">
-    		<paper-button class="uploadBtn paper-font-button" raised on-tap="toggleUpload">Upload New Project
+    	<div class="content-wrapper horizontal center-justified layout">
+    		<paper-button class="uploadBtn paper-font-button" raised on-tap="toggleUpload" disabled=[[invalidInput]]>Upload New Project
 				<iron-icon class="end-justified" icon="file-upload"></paper-button>
     	</div>
 		</div>
@@ -82,11 +86,44 @@
             return this.$.projNameTextBox;
           }
         },
+        noFileSelected: {
+        	type: Boolean,
+        	value: true
+        },
+        invalidInput: {
+          type: Boolean,
+          value: true,
+          computed: '_invalidInput(noFileSelected,projectName,_invalidProjectName)'
+        },
+        projectList: {
+          type: Array,
+          value: []
+        }
 			},
+
+			_handleFileAdded: function() {
+        this.noFileSelected = false;
+        this.$.projNameTextBox.focus();
+      },
+
+      _invalidInput: function(noFileSelected, projectName,_invalidProjectName) {
+        return noFileSelected || _invalidProjectName ||
+          (!projectName || projectName.length === 0);
+      },
 
 			toggleUpload: function() {
 				this.$.collapse.toggle();
-			}
+			},
+
+			_visibleChanged: function() {
+        if (this.visible) {
+          this.projectName = '';
+          this.projectFile = null;
+          this.formData = null;
+          this.noFileSelected = true;
+          this._invalidProjectName = false;
+        }
+      }
 		});
 	</script>
 </dom-module>

@@ -53,7 +53,7 @@
 				@apply(--paper-font-button);
 			}
 			div#signin {
-				padding: 20px;
+				padding: 20px ;
 			}
 		</style>
 
@@ -128,12 +128,10 @@
 			},
 
 			login: function() {
-				console.log('new login');
 				return this.$.auth.signInWithPopup();
 			},
 
 			userDetails: function(details) {
-				console.log(details);
 				if (details) {
 					this.routeToAppPage();
 				}
