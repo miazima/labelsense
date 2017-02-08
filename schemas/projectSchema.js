@@ -6,6 +6,7 @@ var projectSchema   = new Schema({
     	type: String,
     	index: { unique: true }
     },
+    tokens: Array,
     uid: String,
     created_time: Date,
     updated_time: Date,

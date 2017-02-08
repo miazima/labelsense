@@ -1,13 +1,7 @@
-<link rel="import" href="../bower_components/polymerfire/firebase-auth.html">
-<link rel="import" href="../api/api-login.html">
+<link rel="import" href="../.. /bower_components/polymerfire/firebase-auth.html">
 
 <dom-module id="ls-login">
 	<template>
-		<style>
-			:host {
-				display: block;
-			}
-		</style>
 
 		<firebase-auth
 			id="auth" 
@@ -18,14 +12,6 @@
 
 			<!-- on-error="handleError" -->
 		</firebase-auth>
-
-		<api-signin 
-			id="apiSignIn"
-      email="[[user.email]]"
-      uid="[[user.uid]]"
-      admin="true"
-      on-success="_handleSignInSuccess">
-    </api-signin>
 		
 	</template>
 	<script>
@@ -36,6 +22,10 @@
 				user: {
 					type: Object,
 					observer: 'userDetails'
+				},
+				userId: {
+					type: String,
+					notify: true
 				},
 				statusKnown: {
 					type: Object
@@ -56,13 +46,6 @@
 
 			userDetails: function(details) {
 				console.log(details);
-			},
-
-			isAuthenticated:function(auth) {
-				if (auth) {
-					this.$.apiSignIn.generateRequest();
-					this.fire('circle-click');
-				}
 			}
 		});
 	</script>

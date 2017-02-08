@@ -4,11 +4,11 @@ var express = require('express');
 var router = express.Router();              // get an instance of the express Router
 
 var UserSchema = require('../schemas/userSchema');
-var DataSchema = require('../schemas/dataSchema');
+var ProjectSchema = require('../schemas/projectSchema');
 
 // Applying middleware to all routes in the router
 router.use(function (req, res, next) {
-	UserSchema.find({ email: req.query.email })
+	UserSchema.find({ uid: req.query.uid })
 						 .where ('admin').equals(true)
 						 .select('uid email admin')
 						 .exec(function(err, user) {
@@ -21,23 +21,23 @@ router.route('/project')
 
     // create a project (accessed at POST http://localhost:8080/api/projects)
     .post(function(req, res) {
-        var project = new DataSchema();      // create a new instance of the project model
-        project.uid = req.body.uid;  // set the projects name (comes from the request)
-        project.email = req.body.email;
-        project.admin = req.body.admin;
+        var project = new ProjectSchema();      // create a new instance of the project model
+        console.log(req.body.file);
+        // project.uid = req.body.uid;  // set the projects name (comes from the request)
+        // project.email = req.body.email;
+        // project.admin = req.body.admin;
 
-        // save the project and check for errors
-        project.save(function(err) {
+        // // save the project and check for errors
+        // project.save(function(err) {
                 
             res.json({ 
-              err: err,
-              message: 'DataSchema created!' });
-        });
+              message: 'ProjectSchema created!' });
+        // });
     })
 
      // get all the projects (accessed at GET http://localhost:8080/api/projects)
     .get(function(req, res) {
-        DataSchema.find(function(err, projects) {
+        ProjectSchema.find(function(err, projects) {
             res.json({
               err: err,
               projects: projects
