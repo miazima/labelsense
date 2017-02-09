@@ -1,4 +1,4 @@
-<link rel="import" href="../.. /bower_components/polymerfire/firebase-auth.html">
+<link rel="import" href="../../bower_components/polymerfire/firebase-auth.html">
 
 <dom-module id="ls-login">
 	<template>
@@ -6,8 +6,8 @@
 		<firebase-auth
 			id="auth" 
 			user="{{user}}" 
-			status-known="{{statusKnown}}"
 			signed-in="{{signedIn}}"
+			status-known="{{statusKnown}}"
 			provider="google">
 
 			<!-- on-error="handleError" -->
@@ -20,8 +20,7 @@
 
 			properties: {
 				user: {
-					type: Object,
-					observer: 'userDetails'
+					type: Object
 				},
 				userId: {
 					type: String,
@@ -32,9 +31,12 @@
 				},
 				signedIn: {
 					type: Boolean,
-					observer: 'isAuthenticated'
 				}
 			},
+
+			observers: [
+				'isAuthenticated(user,statusKnown,signedIn)'
+			],
 
 			login: function() {
 				return this.$.auth.signInWithPopup();
@@ -44,8 +46,10 @@
 				return this.$.auth.signOut();
 			},
 
-			userDetails: function(details) {
-				console.log(details);
+			isAuthenticated: function(user, statusKnown, signedIn) {
+				if (user && statusKnown && signedIn) {
+					this.userId = user.uid;
+				}
 			}
 		});
 	</script>

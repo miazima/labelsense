@@ -58,33 +58,34 @@
           valid: {
             type: Boolean,
             notify: true,
-            computed: '_isValid(_body,_params)'
+            computed: '_isValid(_body)'
           },
-          _params: {
-            type: Object,
-            computed: '_computeParams(uid)'
-          },
+          // _params: {
+          //   type: Object,
+          //   computed: '_computeParams(uid)'
+          // },
           _body: {
             type: Object,
-            computed: '_computeBody(projectName,file)'
+            computed: '_computeBody(projectName,file,uid)'
           }
         },
 
-        _isValid: function(body, params) {
-          return params && body && true;
+        _isValid: function(body) {
+          return body && true;
         },
 
-        _computeParams: function(uid) {
-          var ret = Object.create(null);
-          ret.uid = uid;
-          return ret;
-        },
+        // _computeParams: function(uid) {
+        //   var ret = Object.create(null);
+        //   ret.uid = uid;
+        //   return ret;
+        // },
 
-        _computeBody: function(projectName, file) {
-          if (!projectName || !file)
+        _computeBody: function(projectName, file, uid) {
+          if (!projectName || !file || !uid)
             return;
           // ensure projectName is valid
           var formData = new FormData();
+          formData.append('uid', uid);
           formData.append('prj', projectName);
           formData.append('file', file);
           return formData;
