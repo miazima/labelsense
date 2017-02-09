@@ -3,8 +3,10 @@
 var express = require('express');  
 var router = express.Router();              // get an instance of the express Router
 var multer = require('multer');
-var fileSystem = require('fs');
-var path = require('path');
+const fileSystem = require('fs');
+const path = require('path');
+const readline = require('readline');
+
 
 var upload = multer({
   dest: __dirname + '/../app/data/',
@@ -30,20 +32,44 @@ router.route('/project')
 
     // create a project (accessed at POST http://localhost:8080/api/projects)
     .post(function(req, res) {
-        var project = new ProjectSchema();      // create a new instance of the project model
-        console.log(req.body.uid);
-        console.log(req.file);
 
         var uploadPath = path.join(__dirname, '/../app/data/', req.body.uid);
-        console.log(uploadPath);
+
         if (!fileSystem.existsSync(uploadPath)){
 					fileSystem.mkdirSync(uploadPath);
 				}
+
 				uploadPath = path.join(uploadPath, req.file.originalname);
         fileSystem.rename(req.file.path, uploadPath, function (err) {
 				  if (err) res.json({ 
               message: 'File not uploaded!' });
 				});
+
+				const rl = readline.createInterface({
+		      input: fileSystem.createReadStream(uploadPath)
+		    });
+			
+				var tokens = [];
+		    rl.on('line', function (line) {
+		      tokens.push(line);
+		    }).on('close', function() {
+	        var project = new ProjectSchema();
+	        project.project_name = req.body.prj;
+	      	  project.uid = req.body.uid;
+						project.tokens = tokens; 
+
+	        project.save(function(err) {
+          	 
+
+						res.json({
+							err: err,
+            	tokens: tokens,
+              message: 'ProjectSchema created!' 
+            });
+        	});
+
+		    	
+		    });
 
         // project.uid = req.body.uid;  // set the projects name (comes from the request)
         // project.email = req.body.email;
@@ -52,8 +78,7 @@ router.route('/project')
         // // save the project and check for errors
         // project.save(function(err) {
                 
-            res.json({ 
-              message: 'ProjectSchema created!' });
+
         // });
     })
 

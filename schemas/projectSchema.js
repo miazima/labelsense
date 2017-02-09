@@ -8,10 +8,22 @@ var projectSchema   = new Schema({
     },
     tokens: Array,
     uid: String,
-    created_time: Date,
-    updated_time: Date,
-    labels: Array,
-    project_settings: Object
+    created_time: {
+    	type: Date,
+    	default: Date.now()
+    },
+    updated_time: {
+    	type: Date,
+    	default: null
+    },
+    labels: {
+    	type: Array,
+    	default: []
+    },
+    project_settings: {
+    	type: Object,
+    	default: null
+    }
 });
 
 module.exports = mongoose.model('Project', projectSchema);
