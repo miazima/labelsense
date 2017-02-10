@@ -70,16 +70,6 @@ router.route('/project')
 
 		    	
 		    });
-
-        // project.uid = req.body.uid;  // set the projects name (comes from the request)
-        // project.email = req.body.email;
-        // project.admin = req.body.admin;
-
-        // // save the project and check for errors
-        // project.save(function(err) {
-                
-
-        // });
     })
 
      // get all the projects (accessed at GET http://localhost:8080/api/projects)

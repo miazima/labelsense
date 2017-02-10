@@ -6,7 +6,7 @@ var projectSchema   = new Schema({
     	type: String,
     	index: { unique: true }
     },
-    tokens: Array,
+    tokens: [String],
     uid: String,
     created_time: {
     	type: Date,
@@ -18,7 +18,7 @@ var projectSchema   = new Schema({
     },
     labels: {
     	type: Array,
-    	default: []
+    	default: [String]
     },
     project_settings: {
     	type: Object,
