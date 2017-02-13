@@ -2,9 +2,8 @@ var mongoose     = require('mongoose');
 var Schema       = mongoose.Schema;
 
 var projectSchema   = new Schema({
-    project_name: {
-    	type: String,
-    	index: { unique: true }
+    prj: {
+    	type: String
     },
     tokens: [String],
     uid: String,
@@ -25,5 +24,7 @@ var projectSchema   = new Schema({
     	default: null
     }
 });
+
+projectSchema.index({ prj: 1, uid: 1 }, { unique: true });
 
 module.exports = mongoose.model('Project', projectSchema);

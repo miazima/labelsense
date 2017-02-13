@@ -2,7 +2,7 @@ var mongoose     = require('mongoose');
 var Schema       = mongoose.Schema;
 
 var dataSchema   = new Schema({
-    project_name: String,
+    prj: String,
     docID: Number,
     labels: Array,
     uid: String,

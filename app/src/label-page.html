@@ -10,7 +10,7 @@
 				display: block;
 			}
 			paper-card {
-				margin: 10px;
+				margin: 30px;
 			}
 			paper-button[toggles][active] {
 			  background: var(--paper-indigo-500);
@@ -18,29 +18,13 @@
 			.card-actions {
 				padding: 10px 16px;
 			}
-			div.nav { 
-				width: 10vw;
-			}
-			div.fixed {
-				/*width: 20vw; */
-				height: calc(100vh - 64px);
-				position: fixed;
-				/*margin-left: auto;*/
-			}
-			paper-fab {
-				margin: auto;
-				top: 50%;
-			}
+			paper-fab { --paper-fab-background: var(--paper-teal-a700); }
+			.content-wrapper { max-width: 1300px; }
 		</style>
 
-		<div class="layout horizontal">
-			<div class="nav">
-				<div class="fixed">
-					<paper-fab icon="arrow-back"></paper-fab>
-				</div>
-			</div>
+		<div class="layout vertical center">
 
-			<div>
+			<div class="content-wrapper">
 				<template is="dom-repeat" items={{tokens}}>
 					<paper-card class="layout vertical">
 					  <div class="card-content">[[item]]</div>
@@ -53,10 +37,9 @@
 				</template>
 			</div>
 
-			<div class="nav">
-				<div class="fixed">
-					<paper-fab icon="arrow-forward"></paper-fab>
-				</div>
+			<div class="layout horizontal justified">
+				<paper-fab icon="arrow-back"></paper-fab>
+				<paper-fab icon="arrow-forward"></paper-fab>
 			</div>
 		</div>
 		
