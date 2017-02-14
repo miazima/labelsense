@@ -7,11 +7,11 @@ var projectSchema   = new Schema({
     },
     tokens: [String],
     uid: String,
-    created_time: {
+    created: {
     	type: Date,
     	default: Date.now()
     },
-    updated_time: {
+    updated: {
     	type: Date,
     	default: null
     },
@@ -19,7 +19,7 @@ var projectSchema   = new Schema({
     	type: Array,
     	default: [String]
     },
-    project_settings: {
+    settings: {
     	type: Object,
     	default: null
     }

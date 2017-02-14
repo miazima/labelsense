@@ -1,0 +1,124 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/iron-ajax/iron-ajax.html">
+<link rel="import" href="./ls-login.html">
+<link rel="import" href="./api-behavior.html">
+
+<dom-module id="api-settings">
+  <template>
+  
+    <ls-login user-id="{{uid}}"></ls-login>
+
+    <iron-ajax id="xhr"
+      url="[[url]]"
+      method="POST"
+      handle-as="json"
+      body="[[_body]]"
+      loading="{{loading}}"
+      last-error="{{_ajaxError}}"
+      last-response="{{_results}}"></iron-ajax>
+
+    <iron-ajax id="xhr2"
+        url="[[url]]"
+        method="GET"
+        handle-as="json"
+        params="[[_params]]"
+        loading="{{loading}}"
+        last-error="{{_ajaxError}}"
+        last-response="{{_results2}}"></iron-ajax>
+
+  </template>
+
+  <script>
+    (function() {
+      'use strict';
+
+      Polymer({
+        is: 'api-settings',
+        behaviors: [
+          HiveOSS.ApiBehavior
+        ],
+        properties: {
+          uid: String,
+          /*
+           * csv or excel `File` to upload.
+           */
+          file: Object,
+          /*
+           * Project name for the file.
+           */
+          projectName: String,
+          _results2: Object,
+          url: {
+            type: String,
+            value: 'api/project'
+          },
+          valid: {
+            type: Boolean,
+            notify: true,
+            computed: '_isValid(_body)'
+          },
+          _params: {
+            type: Object,
+            computed: '_computeParams(uid)'
+          },
+          _body: {
+            type: Object,
+            computed: '_computeBody(projectName,file,uid)'
+          },
+          projectList: {
+            type: Array,
+            computed: '_get(_results2.projects)',
+            notify: true
+          },
+          getRequest: {
+            type: Boolean,
+            value: false
+          }
+        },
+
+        observers: [
+          '_getProjects(_params,getRequest)'
+        ],
+
+        _get: function(item) {
+          return item;
+        },
+
+        _isValid: function(body) {
+          return body && true;
+        },
+
+        _computeParams: function(uid) {
+          var ret = Object.create(null);
+          ret.uid = uid;
+          return ret;
+        },
+
+        _computeBody: function(projectName, file, uid) {
+          if (!projectName || !file || !uid)
+            return;
+          // ensure projectName is valid
+          var formData = new FormData();
+          formData.append('uid', uid);
+          formData.append('prj', projectName);
+          formData.append('file', file);
+          return formData;
+        },
+
+        uploadProject: function() {
+          this.$.xhr.generateRequest();
+        },
+
+        getProjects: function() {
+          this.getRequest = true;
+        },
+
+        _getProjects: function(params, getRequest) {
+          if (!params || !getRequest) return;
+          this.$.xhr2.generateRequest();
+          this.getRequest = false;
+        }
+      });
+    })();
+  </script>
+</dom-module>

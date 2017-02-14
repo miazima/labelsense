@@ -27,6 +27,7 @@
     "iron-icons": "PolymerElements/iron-icons#^1.2.0",
     "hiveoss-dragdrop-box": "^1.0.0",
     "iron-pages": "PolymerElements/iron-pages#^1.0.8",
-    "iron-validator-behavior": "PolymerElements/iron-validator-behavior#^1.0.1"
+    "iron-validator-behavior": "PolymerElements/iron-validator-behavior#^1.0.1",
+    "iron-a11y-keys": "PolymerElements/iron-a11y-keys#^1.0.6"
   }
 }

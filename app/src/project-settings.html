@@ -5,6 +5,7 @@
 <link rel="import" href="../bower_components/paper-input/paper-input.html">
 <link rel="import" href="../bower_components/paper-item/paper-item.html">
 <link rel="import" href="../bower_components/iron-icon/iron-icon.html">
+<link rel="import" href="../bower_components/iron-a11y-keys/iron-a11y-keys.html">
 <link rel="import" href="theme/shared-styles.html">
 
 <dom-module id="project-settings">
@@ -27,14 +28,35 @@
 			paper-textarea.textarea {
 				width: 40%;
 			}
+			paper-item {
+				cursor: pointer;
+				--paper-item-focused: { color: var(--paper-teal-500); };
+			}
+			paper-button.save { background: var(--paper-teal-a700); }
+			paper-item:hover { background: var(--paper-grey-200); }
+			paper-listbox { min-width: 200px; }
 		</style>
 
 		<div class="main-content-wrapper layout vertical wrap">
+			
+			<div class="layout horizontal justified">
+				<div class="paper-font-display1">ProjectName</div>
+				<paper-dropdown-menu label="Switch Project">
+					  <paper-listbox class="dropdown-content" selected="1">
+					    <template is="dom-repeat" items={{projectList}}>
+					    	<paper-item>[[item.prj]]</paper-item>
+					    </template>
+					  </paper-listbox>
+					</paper-dropdown-menu>
+			</div>
+			<div>
+				<paper-button class="save accent-btn" on-tap="saveSettings" raised>save</paper-button>
+			</div>
+			
 			<div class="paper-font-title">Page Display</div>
 			<div class="settings layout horizontal wrap">
-				<!-- <div class="paper-font-body1">Number of sentences per page:</div> -->
 				<paper-dropdown-menu label="Number of sentences per page:">
-				  <paper-listbox class="dropdown-content" selected="1">
+				  <paper-listbox class="dropdown-content" selected="{{settings.display}}">
 				    <paper-item>5 sentences</paper-item>
 				    <paper-item>10 sentences</paper-item>
 				    <paper-item>15 sentences</paper-item>
@@ -45,7 +67,7 @@
 
 			<div class="paper-font-title">User Instructions</div>
 			<div class="settings">
-				<paper-textarea class="textarea" label="Instructions for your users"></paper-textarea>
+				<paper-textarea class="textarea" label="Instructions for your users" value="{{settings.instructions}}"></paper-textarea>
 			</div>
 
 			<div class="paper-font-title">Labels</div>
@@ -54,14 +76,14 @@
 					<paper-input-container id="txt-add" class="ta-default-textfield" no-label-float placeholder="Add new label">
 	          <iron-a11y-keys id="a11y" target="[[targetStopwordInput]]" keys="enter" on-keys-pressed="addStopword"></iron-a11y-keys>
 	          <iron-icon icon="add" prefix></iron-icon>
-	          <input id="stopwordAddTextBox" is="iron-input" bind-value="{{inputStopword}}">
+	          <input id="stopwordAddTextBox" is="iron-input" bind-value="{{inputLabel}}">
 	          </paper-icon-button>
 	        </paper-input-container>
 				</div>
 				<div class="content-wrapper layout horizontal wrap">
-					<paper-button class="accent-btn" raised>label</paper-button>
-					<paper-button class="accent-btn" raised>label</paper-button>
-					<paper-button class="accent-btn" raised>label</paper-button>
+					<template is="dom-repeat" items={{labels}}>
+						<paper-button class="accent-btn" raised>[[item]]</paper-button>
+					</template>
 				</div>
 			</div>
 			
@@ -70,7 +92,37 @@
 	</template>
 	<script>
 		Polymer({
-			is: 'project-settings'
+			is: 'project-settings',
+
+			properties: {
+				projectList: Array,
+				project: String,
+				inputLabel: String,
+				settings: {
+					type: Object,
+					value: function() {
+						return {};
+					}
+				},
+				labels: {
+					type: Array,
+					value: function() {
+						return [];
+					}
+				}
+			},
+
+			addStopword: function() {
+				if (!this.inputLabel) return;
+				this.push('labels', this.inputLabel);
+				this.inputLabel = '';
+			},
+
+			saveSettings: function() {
+				console.log(this.settings);
+				console.log(this.labels);
+			}
+
 		});
 	</script>
 </dom-module>

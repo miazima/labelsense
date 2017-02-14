@@ -5,7 +5,7 @@
 <link rel="import" href="../bower_components/iron-icons/iron-icons.html">
 <link rel="import" href="./validator-projectname.html">
 <link rel="import" href="theme/shared-styles.html">
-<link rel="import" href="api/api-upload.html">
+<link rel="import" href="api/api-project.html">
 
 <dom-module id="upload-component">
 	<template>
@@ -32,7 +32,7 @@
 			.paper-textfield { width: 35%; }
 		</style>
 
-		<api-upload id="upload" project-name="[[projectName]]" file="[[projectFile]]"></api-upload>
+		<api-project id="project" project-name="[[projectName]]" file="[[projectFile]]"></api-project>
 		
 		<div class="main-content-wrapper layout vertical center-justified">			
 			<div class="content-wrapper layout vertical">
@@ -116,8 +116,7 @@
 
 			executeUpload: function() {
 				if (this.invalidInput) return;
-				console.log('hello');
-				this.$.upload.generateRequest();
+				this.$.project.uploadProject();
 			},
 
 			_visibleChanged: function() {

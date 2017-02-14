@@ -1,0 +1,61 @@
+<link rel="import" href="api/api-project.html">
+<link rel="import" href="theme/shared-styles.html">
+
+<dom-module id="project-list">
+	<template>
+		<style include="shared-styles">
+			:host {
+				display: block;
+			}
+			div.header {
+				padding: 1em;
+				background: var(--paper-teal-100);
+			}
+			div.row {
+				background: var(--paper-grey-50);
+				padding: 1em;
+			}
+			div.row:hover { background: var(--paper-grey-200); }
+		</style>
+
+		<api-project id="project" project-list="{{projectList}}"></api-project>
+
+		<div class="layout vertical">
+			<div class="layout horizontal header">
+				<div class="flex">Project Name</div>
+				<div class="flex">Created</div>
+				<div class="flex">Labels</div>
+			</div>
+
+			<template is="dom-repeat" items={{projectList}}>
+				<div class="layout horizontal row">
+					<div class="flex">[[item.prj]]</div>
+					<div class="flex">[[item.created_time]]</div>
+					<div class="flex">[[item.labels]]</div>
+					</div>
+			</template>
+		</div>
+		
+	</template>
+	<script>
+		Polymer({
+			is: 'project-list',
+
+			properties: {
+				visible: {
+					type: Boolean,
+					observer: '_visibleChanged'
+				},
+				projectList: {
+					type: Array,
+					notify: true
+				}
+			},
+
+			_visibleChanged: function(vis) {
+				if (vis) this.$.project.getProjects();
+			}
+
+		});
+	</script>
+</dom-module>

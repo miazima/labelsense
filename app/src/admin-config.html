@@ -4,6 +4,7 @@
 <link rel="import" href="../bower_components/iron-pages/iron-pages.html">
 <link rel="import" href="./upload-component.html">
 <link rel="import" href="./project-settings.html">
+<link rel="import" href="./project-list.html">
 <link rel="import" href="theme/shared-styles.html">
 
 <dom-module id="admin-config">
@@ -32,10 +33,10 @@
 		  		<paper-tab>Settings</paper-tab>
 		  	</paper-tabs>
 
-		  	<iron-pages selected="{{selectedTab}}">
+		  	<iron-pages selected="{{selectedTab}}" selected-attribute="visible">
 	  	    	<upload-component></upload-component>
-		  	    <project-settings></project-settings>
-		  	    <div>page 3</div>
+		  	    <project-settings project-list="{{projectList}}"></project-settings>
+		  	    <project-list project-list="{{projectList}}"></project-list>
 		  	</iron-pages>
 		</paper-card>
 		
@@ -46,9 +47,8 @@
 			properties: {
 				selectedTab: {
 					type: Number,
-					value: 0
-				}
-			}
+					value: 1
+				}			}
 		});
 	</script>
 </dom-module>
