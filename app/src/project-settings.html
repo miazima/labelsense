@@ -6,7 +6,11 @@
 <link rel="import" href="../bower_components/paper-item/paper-item.html">
 <link rel="import" href="../bower_components/iron-icon/iron-icon.html">
 <link rel="import" href="../bower_components/iron-a11y-keys/iron-a11y-keys.html">
+<link rel="import" href="../bower_components/neon-animation/neon-animation-runner-behavior.html">
+<link rel="import" href="../bower_components/neon-animation/animations/fade-out-animation.html">
+<link rel="import" href="../bower_components/neon-animation/animations/fade-in-animation.html">
 <link rel="import" href="theme/shared-styles.html">
+<link rel="import" href="api/api-settings.html">
 
 <dom-module id="project-settings">
 	<template>
@@ -35,7 +39,21 @@
 			paper-button.save { background: var(--paper-teal-a700); }
 			paper-item:hover { background: var(--paper-grey-200); }
 			paper-listbox { min-width: 200px; }
+			paper-button.accent-btn {
+				padding: 0.5em 1em;
+			}
+			iron-icon.delete {
+				width: 20px;
+				padding-left: 10px;
+				opacity: 0.5;
+				transition: opacity 0.3s;
+			}
+			iron-icon.delete:hover {
+				opacity: 1;
+			}
 		</style>
+
+		<api-settings project-name="[[projectName]]" settings="{{settings}}"></api-settings>
 
 		<div class="main-content-wrapper layout vertical wrap">
 			
@@ -74,15 +92,17 @@
 			<div class="settings layout vertical">
 				<div class="content-wrapper layout horizontal">
 					<paper-input-container id="txt-add" class="ta-default-textfield" no-label-float placeholder="Add new label">
-	          <iron-a11y-keys id="a11y" target="[[targetStopwordInput]]" keys="enter" on-keys-pressed="addStopword"></iron-a11y-keys>
+	          <iron-a11y-keys id="a11y" target="[[targetStopwordInput]]" keys="enter" on-keys-pressed="addLabel"></iron-a11y-keys>
 	          <iron-icon icon="add" prefix></iron-icon>
 	          <input id="stopwordAddTextBox" is="iron-input" bind-value="{{inputLabel}}">
-	          </paper-icon-button>
 	        </paper-input-container>
 				</div>
-				<div class="content-wrapper layout horizontal wrap">
+				<div id="labels" class="content-wrapper layout horizontal wrap">
 					<template is="dom-repeat" items={{labels}}>
-						<paper-button class="accent-btn" raised>[[item]]</paper-button>
+						<paper-button class="accent-btn" raised>
+							<span>[[item]]</span>
+							<iron-icon icon="clear" class="delete" on-tap="removeLabel"></iron-icon>
+						</paper-button>
 					</template>
 				</div>
 			</div>
@@ -94,10 +114,15 @@
 		Polymer({
 			is: 'project-settings',
 
+			behaviors: [
+		    Polymer.NeonAnimationRunnerBehavior
+		  ],
+
 			properties: {
 				projectList: Array,
 				project: String,
 				inputLabel: String,
+				deletedLabel: String,
 				settings: {
 					type: Object,
 					value: function() {
@@ -109,13 +134,50 @@
 					value: function() {
 						return [];
 					}
+				},
+				animationConfig: {
+					value: function() {
+						return {
+							'exitLabel': {
+								name: 'fade-out-animation'
+							},
+							'entryLabels': {
+								name: 'fade-in-animation',
+								node: this.$.labels,
+								timing: {
+									duration: 5000
+								}
+							}
+						}
+					}
 				}
 			},
 
-			addStopword: function() {
+			listeners: {
+		    'neon-animation-finish': '_onNeonAnimationFinish'
+		  },
+
+			addLabel: function() {
 				if (!this.inputLabel) return;
-				this.push('labels', this.inputLabel);
+				this.push('labels', this.inputLabel.trim());
 				this.inputLabel = '';
+			},
+
+			removeLabel: function(e) {
+				this.deletedLabel = e.model.item;
+				this.animationConfig.exitLabel.node = e.target.parentElement;
+        this.playAnimation('exitLabel', 'removeLabel');
+			},
+
+			_onNeonAnimationFinish: function(e, animation) {
+				console.log(e, animation);
+				switch(animation) {
+			    case 'removeLabel':
+		        // this.playAnimation('entryLabels');
+			      var index = this.labels.indexOf(this.deletedLabel);
+		        this.splice('labels', index, 1);
+			      break;
+			  }
 			},
 
 			saveSettings: function() {

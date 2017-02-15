@@ -39,7 +39,11 @@ router.route('/users')
 
      // get all the users (accessed at GET http://localhost:8080/api/users)
     .get(function(req, res) {
-        UserSchema.find(function(err, users) {
+        var user = {};
+        if (req.query.uid) {
+            user.uid = req.query.uid;
+        }
+        UserSchema.find(user, function(err, users) {
             if (err)
                 res.send(err);
 

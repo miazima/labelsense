@@ -40,10 +40,6 @@
         properties: {
           uid: String,
           /*
-           * csv or excel `File` to upload.
-           */
-          file: Object,
-          /*
            * Project name for the file.
            */
           projectName: String,
@@ -59,15 +55,15 @@
           },
           _params: {
             type: Object,
-            computed: '_computeParams(uid)'
+            computed: '_computeParams(uid,projectName)'
           },
           _body: {
             type: Object,
-            computed: '_computeBody(projectName,file,uid)'
+            computed: '_computeBody(projectName,uid)'
           },
-          projectList: {
+          setings: {
             type: Array,
-            computed: '_get(_results2.projects)',
+            computed: '_get(_results.setings)',
             notify: true
           },
           getRequest: {
@@ -91,18 +87,16 @@
         _computeParams: function(uid) {
           var ret = Object.create(null);
           ret.uid = uid;
+          ret.prj = prj;
           return ret;
         },
 
-        _computeBody: function(projectName, file, uid) {
-          if (!projectName || !file || !uid)
+        _computeBody: function(projectName, uid) {
+          if (!projectName || !uid)
             return;
-          // ensure projectName is valid
-          var formData = new FormData();
-          formData.append('uid', uid);
-          formData.append('prj', projectName);
-          formData.append('file', file);
-          return formData;
+          var ret = Object.create(null);
+          ret.uid = uid;
+          return ret;
         },
 
         uploadProject: function() {

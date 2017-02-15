@@ -1,4 +1,5 @@
 <link rel="import" href="api/api-project.html">
+<link rel="import" href="api/api-signin.html">
 <link rel="import" href="theme/shared-styles.html">
 
 <dom-module id="project-list">
@@ -18,7 +19,20 @@
 			div.row:hover { background: var(--paper-grey-200); }
 		</style>
 
-		<api-project id="project" project-list="{{projectList}}"></api-project>
+	
+		<api-project id="project" uid="{{uid}}" project-list="{{projectList}}"></api-project>
+		<api-signin id="signin" uid="[[uid]]" project="{{project}}"></api-signin>
+
+		<div class="layout horizontal justified">
+				<div class="paper-font-display1">[[project]]</div>
+				<paper-dropdown-menu label="Switch Project">
+					  <paper-listbox class="dropdown-content" selected="1">
+					    <template is="dom-repeat" items={{projectList}}>
+					    	<paper-item>[[item.prj]]</paper-item>
+					    </template>
+					  </paper-listbox>
+					</paper-dropdown-menu>
+			</div>
 
 		<div class="layout vertical">
 			<div class="layout horizontal header">
@@ -49,11 +63,16 @@
 				projectList: {
 					type: Array,
 					notify: true
-				}
+				},
+				project: String,
+				uid: String
 			},
 
 			_visibleChanged: function(vis) {
-				if (vis) this.$.project.getProjects();
+				if (vis) {
+					this.$.project.getProjects();
+					this.$.signin.getUser();
+				}
 			}
 
 		});

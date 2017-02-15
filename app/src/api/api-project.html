@@ -38,7 +38,11 @@
           HiveOSS.ApiBehavior
         ],
         properties: {
-          uid: String,
+          uid: {
+            type: String,
+            notify: true,
+            readonly: true
+          },
           /*
            * csv or excel `File` to upload.
            */

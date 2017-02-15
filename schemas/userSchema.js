@@ -10,7 +10,8 @@ var userSchema   = new Schema({
     	type: String,
     	index: { unique: true }
     },
-    admin: Boolean
+    admin: Boolean,
+    prj: String
 });
 
 module.exports = mongoose.model('User', userSchema);
