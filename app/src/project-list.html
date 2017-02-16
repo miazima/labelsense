@@ -1,5 +1,8 @@
-<link rel="import" href="api/api-project.html">
-<link rel="import" href="api/api-signin.html">
+<link rel="import" href="../bower_components/paper-dropdown-menu/paper-dropdown-menu.html">
+<link rel="import" href="../bower_components/paper-listbox/paper-listbox.html">
+<link rel="import" href="../bower_components/paper-item/paper-item.html">
+<link rel="import" href="../bower_components/iron-icon/iron-icon.html">
+<link rel="import" href="../bower_components/neon-animation/neon-shared-element-animatable-behavior.html">
 <link rel="import" href="theme/shared-styles.html">
 
 <dom-module id="project-list">
@@ -15,24 +18,44 @@
 			div.row {
 				background: var(--paper-grey-50);
 				padding: 1em;
+				cursor: pointer;
 			}
 			div.row:hover { background: var(--paper-grey-200); }
+			div.settings { padding: 20px; }
+			div.settings > * { padding-bottom: 20px; }
+			paper-dropdown-menu {
+				--paper-dropdown-menu: {
+					/*font-size: 16px;*/
+				};
+				 --paper-input-container-label: {
+            color: var(--paper-teal-500);
+            font-size: 20px;
+        };
+			}
+			paper-item {
+				cursor: pointer;
+				--paper-item-focused: { color: var(--paper-teal-500); };
+			}
+			paper-item:hover { background: var(--paper-grey-200); }
+			iron-icon.info {
+				--iron-icon-fill-color: var(--paper-indigo-500);
+				padding-right: 10px;
+			}
 		</style>
 
-	
-		<api-project id="project" uid="{{uid}}" project-list="{{projectList}}"></api-project>
-		<api-signin id="signin" uid="[[uid]]" project="{{project}}"></api-signin>
-
-		<div class="layout horizontal justified">
-				<div class="paper-font-display1">[[project]]</div>
-				<paper-dropdown-menu label="Switch Project">
-					  <paper-listbox class="dropdown-content" selected="1">
-					    <template is="dom-repeat" items={{projectList}}>
-					    	<paper-item>[[item.prj]]</paper-item>
-					    </template>
-					  </paper-listbox>
-					</paper-dropdown-menu>
+		<div class="settings">
+			<div class="layout horizontal">
+				<iron-icon class="info" icon="info"></iron-icon>
+				<div class="paper-font-subhead">Choose a project for users to label</div>
 			</div>
+			<paper-dropdown-menu label="Switch Current Project">
+			  <paper-listbox class="dropdown-content" selected="{{project}}" attr-for-selected="value">
+			    <template is="dom-repeat" items={{projectList}}>
+			    	<paper-item value="[[item.prj]]">[[item.prj]]</paper-item>
+			    </template>
+			  </paper-listbox>
+			</paper-dropdown-menu>
+		</div>
 
 		<div class="layout vertical">
 			<div class="layout horizontal header">
@@ -42,7 +65,7 @@
 			</div>
 
 			<template is="dom-repeat" items={{projectList}}>
-				<div class="layout horizontal row">
+				<div class="layout horizontal row" on-tap="openSettings">
 					<div class="flex">[[item.prj]]</div>
 					<div class="flex">[[item.created_time]]</div>
 					<div class="flex">[[item.labels]]</div>
@@ -55,24 +78,55 @@
 		Polymer({
 			is: 'project-list',
 
+			behaviors: [
+	      Polymer.NeonSharedElementAnimatableBehavior
+	    ],
+
 			properties: {
-				visible: {
-					type: Boolean,
-					observer: '_visibleChanged'
-				},
 				projectList: {
-					type: Array,
-					notify: true
+					type: Array
 				},
-				project: String,
-				uid: String
+				project: {
+					type: String
+				},
+				uid: String,
+				animationConfig: {
+					type: Object,
+					value: function() {
+						return {
+							'exit': [{
+	              name: 'ripple-animation',
+	              id: 'ripple',
+	              fromPage: this
+	            }, {
+	              name: 'hero-animation',
+	              id: 'hero',
+	              fromPage: this
+	            }]
+						};
+					}
+				}
 			},
 
-			_visibleChanged: function(vis) {
-				if (vis) {
-					this.$.project.getProjects();
-					this.$.signin.getUser();
-				}
+			openSettings: function(event) {
+				var target = event.target;
+	      while (target !== this && !target._templateInstance) {
+	        target = target.parentNode;
+	      }
+
+				// configure the page animation
+	      this.sharedElements = {
+	        'hero': target,
+	        'ripple': target
+	      };
+	      this.animationConfig['exit'][0].gesture = {
+	       	x: event.detail.x,
+	        y: event.detail.y
+	      };
+	      this.fire('open-settings', {
+	        tile: target,
+	        data: target._templateInstance.item
+	      });
 			}
 
 		});

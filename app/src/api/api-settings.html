@@ -1,13 +1,10 @@
 <link rel="import" href="../../bower_components/polymer/polymer.html">
 <link rel="import" href="../../bower_components/iron-ajax/iron-ajax.html">
-<link rel="import" href="./ls-login.html">
 <link rel="import" href="./api-behavior.html">
 
 <dom-module id="api-settings">
   <template>
   
-    <ls-login user-id="{{uid}}"></ls-login>
-
     <iron-ajax id="xhr"
       url="[[url]]"
       method="POST"
@@ -21,6 +18,7 @@
         url="[[url]]"
         method="GET"
         handle-as="json"
+        content-type="application/json"
         params="[[_params]]"
         loading="{{loading}}"
         last-error="{{_ajaxError}}"
@@ -42,11 +40,11 @@
           /*
            * Project name for the file.
            */
-          projectName: String,
+          project: String,
           _results2: Object,
           url: {
             type: String,
-            value: 'api/project'
+            value: 'api/settings'
           },
           valid: {
             type: Boolean,
@@ -55,26 +53,19 @@
           },
           _params: {
             type: Object,
-            computed: '_computeParams(uid,projectName)'
+            computed: '_computeParams(uid,project)'
           },
           _body: {
             type: Object,
-            computed: '_computeBody(projectName,uid)'
+            computed: '_computeBody(project,uid,save)'
           },
+          save: Object,
           setings: {
             type: Array,
             computed: '_get(_results.setings)',
             notify: true
-          },
-          getRequest: {
-            type: Boolean,
-            value: false
           }
         },
-
-        observers: [
-          '_getProjects(_params,getRequest)'
-        ],
 
         _get: function(item) {
           return item;
@@ -84,34 +75,28 @@
           return body && true;
         },
 
-        _computeParams: function(uid) {
+        _computeParams: function(uid, prj) {
           var ret = Object.create(null);
           ret.uid = uid;
           ret.prj = prj;
           return ret;
         },
 
-        _computeBody: function(projectName, uid) {
-          if (!projectName || !uid)
+        _computeBody: function(prj, uid, save) {
+          if (!prj || !uid || !save)
             return;
-          var ret = Object.create(null);
-          ret.uid = uid;
-          return ret;
+          console.log(uid, prj, save);
+          return {
+            uid: uid,
+            prj: prj,
+            setings: save
+          }
         },
 
-        uploadProject: function() {
-          this.$.xhr.generateRequest();
-        },
-
-        getProjects: function() {
-          this.getRequest = true;
-        },
-
-        _getProjects: function(params, getRequest) {
-          if (!params || !getRequest) return;
+        getSettings: function() {
           this.$.xhr2.generateRequest();
-          this.getRequest = false;
-        }
+        },
+
       });
     })();
   </script>

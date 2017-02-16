@@ -3,8 +3,9 @@
 <link rel="import" href="../bower_components/neon-animation/neon-animated-pages.html">
 <link rel="import" href="../bower_components/iron-pages/iron-pages.html">
 <link rel="import" href="./upload-component.html">
-<link rel="import" href="./project-settings.html">
-<link rel="import" href="./project-list.html">
+<!-- <link rel="import" href="./project-settings.html"> -->
+<!-- <link rel="import" href="./project-list.html"> -->
+<link rel="import" href="./project-page.html">
 <link rel="import" href="theme/shared-styles.html">
 
 <dom-module id="admin-config">
@@ -29,14 +30,12 @@
 		<paper-card class="neon-paper-card layout vertical" image="" elevation="1" animated-shadow="false">
 		  <paper-tabs selected="{{selectedTab}}">
 		  		<paper-tab>New Project</paper-tab>
-		  		<paper-tab>Projects</paper-tab>
-		  		<paper-tab>Settings</paper-tab>
+		  		<paper-tab>Project Settings</paper-tab>
 		  	</paper-tabs>
 
 		  	<iron-pages selected="{{selectedTab}}" selected-attribute="visible">
 	  	    	<upload-component></upload-component>
-		  	    <project-settings project-list="{{projectList}}"></project-settings>
-		  	    <project-list project-list="{{projectList}}"></project-list>
+		  	    <project-page></project-page>
 		  	</iron-pages>
 		</paper-card>
 		
@@ -48,7 +47,8 @@
 				selectedTab: {
 					type: Number,
 					value: 1
-				}			}
+				}
+			}
 		});
 	</script>
 </dom-module>

@@ -17,6 +17,7 @@ var ProjectSchema = require('../schemas/projectSchema');
 
 // Applying middleware to all routes in the router
 router.use(upload, function (req, res, next) {
+	console.log(req.body);
 	var uid = req.query.uid || req.body.uid;
 	UserSchema
 		.find({ uid: uid })
@@ -59,14 +60,14 @@ router.route('/project')
       	  project.uid = req.body.uid;
 					project.tokens = tokens; 
 
-					UserSchema.findOneAndUpdate({ uid: req.body.uid }, { $set: { prj: req.body.prj } },
-						function(err) {
-							if (err)
-								res.json({
-									err: err,
-									message: 'Project did not get saved as default.'
-								});
-						});
+					// UserSchema.findOneAndUpdate({ uid: req.body.uid }, { $set: { prj: req.body.prj } },
+					// 	function(err) {
+					// 		if (err)
+					// 			res.json({
+					// 				err: err,
+					// 				message: 'Project did not get saved as default.'
+					// 			});
+					// 	});
 
 	        project.save(function(err) {
 						res.json({
@@ -93,40 +94,29 @@ router.route('/settings')
 
     .post(function(req, res) {
 
-        var uploadPath = path.join(__dirname, '/../app/data/', req.body.uid);
-
-        if (!fileSystem.existsSync(uploadPath)){
-					fileSystem.mkdirSync(uploadPath);
-				}
-
-				uploadPath = path.join(uploadPath, req.file.originalname);
-        fileSystem.rename(req.file.path, uploadPath, function (err) {
-				  if (err) res.json({ 
-              message: 'File not uploaded!' });
-				});
-
-				const rl = readline.createInterface({
-		      input: fileSystem.createReadStream(uploadPath)
-		    });
-			
-				var tokens = [];
-		    rl.on('line', function (line) {
-		      tokens.push(line);
-		    }).on('close', function() {
-	        var project = new ProjectSchema();
-	        project.prj = req.body.prj;
-      	  project.uid = req.body.uid;
-					project.tokens = tokens; 
-
-	        project.save(function(err) {
+			ProjectSchema.findOneAndUpdate({ uid: req.body.uid, prj: req.body.prj }, 
+				{ $set: { settings: req.body.settings } },
+				function(err) {
+					if (err)
 						res.json({
 							err: err,
-            	tokens: tokens,
-              message: 'ProjectSchema created!' 
-            });
-        	});
+							message: 'Project settings did not get saved.'
+						});
+				});
 
-		    });
+   //    var project = new ProjectSchema();
+   //    project.prj = req.body.prj;
+  	//   project.uid = req.body.uid;
+			// project.tokens = tokens; 
+
+   //    project.save(function(err) {
+			// 	res.json({
+			// 		err: err,
+   //      	tokens: tokens,
+   //        message: 'ProjectSchema created!' 
+   //      });
+   //  	});
+
     })
 
      // get all the projects (accessed at GET http://localhost:8080/api/projects)
