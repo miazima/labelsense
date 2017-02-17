@@ -3,10 +3,9 @@
 <link rel="import" href="../bower_components/neon-animation/neon-animated-pages.html">
 <link rel="import" href="../bower_components/iron-pages/iron-pages.html">
 <link rel="import" href="./upload-component.html">
-<!-- <link rel="import" href="./project-settings.html"> -->
-<!-- <link rel="import" href="./project-list.html"> -->
 <link rel="import" href="./project-page.html">
 <link rel="import" href="theme/shared-styles.html">
+<link rel="import" href="api/api-signin.html">
 
 <dom-module id="admin-config">
 	<template>
@@ -26,16 +25,18 @@
 	    }
 		</style>
 
+		<api-signin id="signin" uid="{{uid}}" default-project="{{defaultProject}}"></api-signin>
+
 		<!-- <div class="paper-font-headline">Configure Labelling Environment</div> -->
-		<paper-card class="neon-paper-card layout vertical" image="" elevation="1" animated-shadow="false">
+		<paper-card class="neon-paper-card layout vertical" elevation="1" animated-shadow>
 		  <paper-tabs selected="{{selectedTab}}">
 		  		<paper-tab>New Project</paper-tab>
-		  		<paper-tab>Project Settings</paper-tab>
+		  		<paper-tab>Projects and Settings</paper-tab>
 		  	</paper-tabs>
 
 		  	<iron-pages selected="{{selectedTab}}" selected-attribute="visible">
 	  	    	<upload-component></upload-component>
-		  	    <project-page></project-page>
+		  	    <project-page uid="[[uid]]" default-project="[[defaultProject]]"></project-page>
 		  	</iron-pages>
 		</paper-card>
 		
@@ -47,7 +48,15 @@
 				selectedTab: {
 					type: Number,
 					value: 1
+				},
+				uid: {
+					type: String,
+					observer: 'getAdminDetails'
 				}
+			},
+
+			getAdminDetails: function() {
+					this.$.signin.getUser();
 			}
 		});
 	</script>

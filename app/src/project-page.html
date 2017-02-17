@@ -3,7 +3,6 @@
 <link rel="import" href="./project-settings.html">
 <link rel="import" href="./project-list.html">
 <link rel="import" href="api/api-project.html">
-<link rel="import" href="api/api-signin.html">
 <link rel="import" href="api/api-settings.html">
 
 <dom-module id="project-page">
@@ -20,13 +19,12 @@
 			neon-animated-pages { min-height: 600px; }
 		</style>
 
-		<api-project id="project" uid="{{uid}}" project-list="{{projectList}}"></api-project>
-		<api-signin id="signin" uid="[[uid]]" project="{{project}}"></api-signin>
+		<api-project id="project" uid="[[uid]]" project-list="{{projectList}}"></api-project>
 		<api-settings id="settings" uid="[[uid]]" save="[[save]]" project="[[project]]" settings="{{settings}}"></api-settings>
 
 		<neon-animated-pages id="pages" selected="0">
-	    <project-list project-list="{{projectList}}" project="{{project}}" on-open-settings="toggleSettings"></project-list>
-      <project-settings project="[[project]]" on-close-settings="toggleSettings" on-save-settings="saveSettings"></project-settings>
+	    <project-list project-list="{{projectList}}" default-project="[[defaultProject]]" project="{{project}}" on-open-settings="toggleSettings"></project-list>
+      <project-settings project="[[project]]" settings="[[settings]]" on-close-settings="toggleSettings" on-save-settings="saveSettings"></project-settings>
     </neon-animated-pages>
 
 	</template>
@@ -39,13 +37,15 @@
 					type: Boolean,
 					observer: '_visibleChanged'
 				},
-				save: Object
+				uid: String,
+				save: Object,
+				settings: Object,
+				defaultProject: String
 			},
 
 			_visibleChanged: function(vis) {
 				if (vis) {
 					this.$.project.getProjects();
-					this.$.signin.getUser();
 				}
 			},
 
@@ -55,6 +55,7 @@
 					return;
 				}
 				this.$.pages.selected = 1;
+				this.$.settings.getSettings();
 			},
 
 			saveSettings: function(e, info) {

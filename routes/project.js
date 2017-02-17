@@ -17,7 +17,6 @@ var ProjectSchema = require('../schemas/projectSchema');
 
 // Applying middleware to all routes in the router
 router.use(upload, function (req, res, next) {
-	console.log(req.body);
 	var uid = req.query.uid || req.body.uid;
 	UserSchema
 		.find({ uid: uid })
@@ -81,7 +80,7 @@ router.route('/project')
 
      // get all the projects (accessed at GET http://localhost:8080/api/projects)
     .get(function(req, res) {
-        ProjectSchema.find(function(err, projects) {
+        ProjectSchema.find({ uid: req.query.uid }, function(err, projects) {
             res.json({
               err: err,
               projects: projects
@@ -93,36 +92,22 @@ router.route('/project')
 router.route('/settings')
 
     .post(function(req, res) {
+    	console.log(req.body.settings);
 
 			ProjectSchema.findOneAndUpdate({ uid: req.body.uid, prj: req.body.prj }, 
-				{ $set: { settings: req.body.settings } },
+				{ $set: { settings: req.body.settings, labels: req.body.settings.labels } },
 				function(err) {
-					if (err)
 						res.json({
 							err: err,
-							message: 'Project settings did not get saved.'
+							message: 'Project settings were saved.'
 						});
 				});
-
-   //    var project = new ProjectSchema();
-   //    project.prj = req.body.prj;
-  	//   project.uid = req.body.uid;
-			// project.tokens = tokens; 
-
-   //    project.save(function(err) {
-			// 	res.json({
-			// 		err: err,
-   //      	tokens: tokens,
-   //        message: 'ProjectSchema created!' 
-   //      });
-   //  	});
-
     })
 
      // get all the projects (accessed at GET http://localhost:8080/api/projects)
     .get(function(req, res) {
         ProjectSchema
-        	.find({ uid: req.query.uid, prj: req.query.prj })
+        	.findOne({ uid: req.query.uid, prj: req.query.prj })
         	.exec(function(err, prj) {
 						res.json({
 							err: err,

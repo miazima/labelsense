@@ -143,7 +143,8 @@
 					type: Object,
 					value: function() {
 						return {};
-					}
+					},
+					observer: '_getSettings'
 				},
 				labels: {
 					type: Array,
@@ -203,6 +204,10 @@
 		    'neon-animation-finish': '_onNeonAnimationFinish'
 		  },
 
+		  _getSettings: function(sets) {
+
+		  },
+
 			addLabel: function() {
 				if (!this.inputLabel) return;
 				this.push('labels', this.inputLabel.trim());
@@ -216,7 +221,6 @@
 			},
 
 			_onNeonAnimationFinish: function(e, animation) {
-				console.log(e, animation);
 				switch(animation) {
 			    case 'removeLabel':
 		        // this.playAnimation('entryLabels');

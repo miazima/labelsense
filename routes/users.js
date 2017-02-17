@@ -24,7 +24,7 @@ router.route('/users')
     // create a user (accessed at POST http://localhost:8080/api/users)
     .post(function(req, res) {
         var user = new UserSchema();      // create a new instance of the user model
-        user.uid = req.body.uid;  // set the users name (comes from the request)
+        user.uid = req.body.uid;
         user.email = req.body.email;
         user.admin = req.body.admin;
 

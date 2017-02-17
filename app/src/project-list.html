@@ -49,7 +49,7 @@
 				<div class="paper-font-subhead">Choose a project for users to label</div>
 			</div>
 			<paper-dropdown-menu label="Switch Current Project">
-			  <paper-listbox class="dropdown-content" selected="{{project}}" attr-for-selected="value">
+			  <paper-listbox class="dropdown-content" selected="{{defaultProject}}" attr-for-selected="value">
 			    <template is="dom-repeat" items={{projectList}}>
 			    	<paper-item value="[[item.prj]]">[[item.prj]]</paper-item>
 			    </template>
@@ -67,7 +67,7 @@
 			<template is="dom-repeat" items={{projectList}}>
 				<div class="layout horizontal row" on-tap="openSettings">
 					<div class="flex">[[item.prj]]</div>
-					<div class="flex">[[item.created_time]]</div>
+					<div class="flex">[[item.created]]</div>
 					<div class="flex">[[item.labels]]</div>
 					</div>
 			</template>
@@ -86,9 +86,7 @@
 				projectList: {
 					type: Array
 				},
-				project: {
-					type: String
-				},
+				defaultProject: String,
 				uid: String,
 				animationConfig: {
 					type: Object,
@@ -123,10 +121,8 @@
 	       	x: event.detail.x,
 	        y: event.detail.y
 	      };
-	      this.fire('open-settings', {
-	        tile: target,
-	        data: target._templateInstance.item
-	      });
+	      this.project = event.model.item.prj;
+	      this.fire('open-settings');
 			}
 
 		});

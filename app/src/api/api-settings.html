@@ -9,6 +9,7 @@
       url="[[url]]"
       method="POST"
       handle-as="json"
+      content-type="application/json"
       body="[[_body]]"
       loading="{{loading}}"
       last-error="{{_ajaxError}}"
@@ -60,15 +61,11 @@
             computed: '_computeBody(project,uid,save)'
           },
           save: Object,
-          setings: {
+          settings: {
             type: Array,
-            computed: '_get(_results.setings)',
+            computed: '_get(_results2.prj.settings)',
             notify: true
           }
-        },
-
-        _get: function(item) {
-          return item;
         },
 
         _isValid: function(body) {
@@ -89,11 +86,12 @@
           return {
             uid: uid,
             prj: prj,
-            setings: save
+            settings: save
           }
         },
 
         getSettings: function() {
+          // console.log(this._params);
           this.$.xhr2.generateRequest();
         },
 

@@ -1,10 +1,20 @@
-<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/polymerfire/firebase-auth.html">
 <link rel="import" href="../../bower_components/iron-ajax/iron-ajax.html">
+<link rel="import" href="../behaviors/route-behavior.html">
 
 <link rel="import" href="./api-behavior.html">
 
 <dom-module id="api-signin">
   <template>
+
+    <firebase-auth
+      id="auth" 
+      user="{{user}}" 
+      signed-in="{{signedIn}}"
+      provider="google">
+    </firebase-auth>
+
+
     <iron-ajax id="xhr"
       url="[[url]]"
       method="POST"
@@ -34,26 +44,34 @@
       Polymer({
         is: 'api-signin',
         behaviors: [
-          HiveOSS.ApiBehavior
+          HiveOSS.ApiBehavior,
+          HiveOSS.RouteBehavior
         ],
         properties: {
           /*
            * Returns an Array<Object> representing the default project belonging to the user.
            */
-          project: {
+          defaultProject: {
             type: Array,
             notify: true,
             readonly: true,
-            computed: '_getUser(_results2)'
+            computed: '_getDefaultProject(_results2)'
           },
           /*
            * Email of the account.
            */
-          email: String,
+          email: {
+            type: String,
+            computed: '_get(user.email)'
+          },
           /*
            * uid of the account.
            */
-          uid: String,
+          uid: {
+            type: String,
+            computed: '_get(user.uid)',
+            notify: true
+          },
           admin: Boolean,
           signout: {
             type: Boolean,
@@ -75,6 +93,41 @@
           _params: {
             type: Object,
             computed: '_computeParams(uid)'
+          },
+          user: {
+            type: Object,
+            notify: true,
+            observer: 'userDetails'
+          },
+          signedIn: {
+            type: Boolean
+          }
+        },
+
+        observers: [
+          'isAuthenticated(signedIn,uid,email,admin)'
+        ],
+
+        signIn: function() {
+          this.$.auth.signInWithPopup();
+        },
+
+        signOut: function() {
+          this.routeToLandingPage();
+          this.$.auth.signOut();
+        },
+
+        userDetails: function(details) {
+          if (details) {
+            this.routeToAppPage();
+          }
+        },
+
+        isAuthenticated:function(auth, uid, email, admin) {
+          if (!uid || !email || !admin) return;
+          if (auth) {
+            this.generateRequest();
+            this.routeToAppPage();
           }
         },
 
@@ -99,12 +152,11 @@
           return params;
         },
 
-        getUser: function(uid) {
-          this.uid = uid || this.uid;
+        getUser: function() {
           this.$.xhr2.generateRequest();
         },
 
-        _getUser: function(res) {
+        _getDefaultProject: function(res) {
           return res.users[0].prj;
         }
       });
