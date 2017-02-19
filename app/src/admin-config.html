@@ -35,7 +35,7 @@
 		  	</paper-tabs>
 
 		  	<iron-pages selected="{{selectedTab}}" selected-attribute="visible">
-	  	    	<upload-component></upload-component>
+	  	    	<upload-component uid="[[uid]]" on-display-list="_displayList"></upload-component>
 		  	    <project-page uid="[[uid]]" default-project="[[defaultProject]]"></project-page>
 		  	</iron-pages>
 		</paper-card>
@@ -52,11 +52,18 @@
 				uid: {
 					type: String,
 					observer: 'getAdminDetails'
+				},
+				defaultProject: {
+					type: String
 				}
 			},
 
 			getAdminDetails: function() {
 					this.$.signin.getUser();
+			},
+
+			_displayList: function() {
+				this.selectedTab = 1;
 			}
 		});
 	</script>

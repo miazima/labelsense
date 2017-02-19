@@ -32,7 +32,7 @@
 			.paper-textfield { width: 35%; }
 		</style>
 
-		<api-project id="project" project-name="[[projectName]]" file="[[projectFile]]"></api-project>
+		<api-project id="project" uid="[[uid]]" project-name="[[projectName]]" file="[[projectFile]]" on-success="_handleSuccess"></api-project>
 		
 		<div class="main-content-wrapper layout vertical center-justified">			
 			<div class="content-wrapper layout vertical">
@@ -107,6 +107,10 @@
 			_handleFileAdded: function() {
         this.noFileSelected = false;
         this.$.projNameTextBox.focus();
+      },
+
+      _handleSuccess: function() {
+      	this.fire('display-list');
       },
 
       _invalidInput: function(noFileSelected, projectName,_invalidProjectName) {

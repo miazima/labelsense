@@ -4,11 +4,17 @@ var Schema       = mongoose.Schema;
 var userSchema   = new Schema({
     uid: {
     	type: String,
+        index: {
+            unique: true
+        },
     	unique: true,
         required: true
     },
     email: {
     	type: String,
+        index: {
+            unique: true
+        },
         unique: true,
         required: true
     },

@@ -46,10 +46,11 @@
 		<div class="settings">
 			<div class="layout horizontal">
 				<iron-icon class="info" icon="info"></iron-icon>
-				<div class="paper-font-subhead">Choose a project for users to label</div>
+				<div hidden="{{!projectList}}" class="paper-font-subhead">Choose a project for users to label</div>
+				<div hidden="{{projectList}}" class="paper-font-subhead">Create a project!</div>
 			</div>
-			<paper-dropdown-menu label="Switch Current Project">
-			  <paper-listbox class="dropdown-content" selected="{{defaultProject}}" attr-for-selected="value">
+			<paper-dropdown-menu label="Switch Current Project" disabled="[[!projectList]]">
+			  <paper-listbox class="dropdown-content" selected="{{defaultProject}}" attr-for-selected="value"> 
 			    <template is="dom-repeat" items={{projectList}}>
 			    	<paper-item value="[[item.prj]]">[[item.prj]]</paper-item>
 			    </template>
@@ -86,7 +87,10 @@
 				projectList: {
 					type: Array
 				},
-				defaultProject: String,
+				defaultProject: {
+					type: String,
+					observer: '_getDefaultProject'
+				},
 				uid: String,
 				animationConfig: {
 					type: Object,
@@ -104,6 +108,10 @@
 						};
 					}
 				}
+			},
+
+			_getDefaultProject: function(prj) {
+				console.log(prj);
 			},
 
 			openSettings: function(event) {

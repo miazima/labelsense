@@ -59,15 +59,6 @@ router.route('/project')
       	  project.uid = req.body.uid;
 					project.tokens = tokens; 
 
-					// UserSchema.findOneAndUpdate({ uid: req.body.uid }, { $set: { prj: req.body.prj } },
-					// 	function(err) {
-					// 		if (err)
-					// 			res.json({
-					// 				err: err,
-					// 				message: 'Project did not get saved as default.'
-					// 			});
-					// 	});
-
 	        project.save(function(err) {
 						res.json({
 							err: err,
@@ -115,5 +106,18 @@ router.route('/settings')
             });
         	});
     });
+
+router.route('/defaultprj')
+
+	.post(function(req, res), {
+		UserSchema.findOneAndUpdate({ uid: req.body.uid }, { $set: { prj: req.body.prj } },
+		function(err) {
+			if (err)
+				res.json({
+					err: err,
+					message: 'Project did not get saved as default.'
+				});
+		});
+	});
 
 module.exports = router;
