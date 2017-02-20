@@ -84,6 +84,10 @@
 	    ],
 
 			properties: {
+				project: {
+					type: String,
+					notify: true
+				},
 				projectList: {
 					type: Array
 				},
@@ -111,7 +115,7 @@
 			},
 
 			_getDefaultProject: function(prj) {
-				console.log(prj);
+				this.fire('set-default-prj', prj);
 			},
 
 			openSettings: function(event) {

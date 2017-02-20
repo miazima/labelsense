@@ -4,6 +4,7 @@
 <link rel="import" href="./project-list.html">
 <link rel="import" href="api/api-project.html">
 <link rel="import" href="api/api-settings.html">
+<link rel="import" href="api/api-default-prj.html">
 
 <dom-module id="project-page">
 	<template>
@@ -20,11 +21,12 @@
 		</style>
 
 		<api-project id="project" uid="[[uid]]" project-list="{{projectList}}"></api-project>
-		<api-settings id="settings" uid="[[uid]]" save="[[save]]" project="[[project]]" settings="{{settings}}"></api-settings>
+		<api-settings id="settings" uid="[[uid]]" save="[[save]]" project="[[project]]" settings="{{settings}}" labels="{{labels}}"></api-settings>
+		<api-default-prj id="default" uid="[[uid]]" default-prj="{{defaultProject}}"></api-default-prj>
 
 		<neon-animated-pages id="pages" selected="0">
-	    <project-list project-list="{{projectList}}" default-project="[[defaultProject]]" project="{{project}}" on-open-settings="toggleSettings"></project-list>
-      <project-settings project="[[project]]" settings="[[settings]]" on-close-settings="toggleSettings" on-save-settings="saveSettings"></project-settings>
+	    <project-list project-list="{{projectList}}" default-project="[[defaultProject]]" project="{{project}}" on-open-settings="toggleSettings" on-set-default-prj="_setDefaultPrj"></project-list>
+      <project-settings project="[[project]]" settings="[[settings]]" labels="[[labels]]" on-close-settings="toggleSettings" on-save-settings="saveSettings"></project-settings>
     </neon-animated-pages>
 
 	</template>
@@ -47,6 +49,11 @@
 				if (vis) {
 					this.$.project.getProjects();
 				}
+			},
+
+			_setDefaultPrj: function(e, prj) {
+				this.defaultProject = prj;
+				this.$.default.generateRequest();
 			},
 
 			toggleSettings: function(e) {

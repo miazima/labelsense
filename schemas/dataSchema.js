@@ -4,7 +4,7 @@ var Schema       = mongoose.Schema;
 var dataSchema   = new Schema({
     prj: String,
     docID: Number,
-    labels: Array,
+    labels: [String],
     uid: String,
     index_start: {
     	type: Number,

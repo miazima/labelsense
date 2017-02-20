@@ -109,7 +109,7 @@
 	        </paper-input-container>
 				</div>
 				<div id="labels" class="content-wrapper layout horizontal wrap">
-					<template is="dom-repeat" items={{labels}}>
+					<template is="dom-repeat" items=[[labels]]>
 						<paper-button class="accent-btn" raised>
 							<span>[[item]]</span>
 							<iron-icon icon="clear" class="delete" on-tap="removeLabel"></iron-icon>
@@ -141,16 +141,11 @@
 				deletedLabel: String,
 				settings: {
 					type: Object,
-					value: function() {
-						return {};
-					},
 					observer: '_getSettings'
 				},
 				labels: {
 					type: Array,
-					value: function() {
-						return [];
-					}
+					observer: '_getLabels'
 				},
 				sharedElements: {
 	        type: Object,
@@ -205,11 +200,16 @@
 		  },
 
 		  _getSettings: function(sets) {
+		  	if (!sets) this.settings = {};
+		  },
 
+		  _getLabels: function(labels) {
+		  	console.log(labels);
 		  },
 
 			addLabel: function() {
 				if (!this.inputLabel) return;
+				console.log('add labels');
 				this.push('labels', this.inputLabel.trim());
 				this.inputLabel = '';
 			},
@@ -231,8 +231,10 @@
 			},
 
 			saveSettings: function() {
-				this.settings.labels = this.labels;
-				this.fire('save-settings', this.settings);
+				this.fire('save-settings', {
+					settings: this.settings,
+					labels: this.labels
+				});
 			},
 
 			closeSettings: function() {

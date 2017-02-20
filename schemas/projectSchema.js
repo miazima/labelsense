@@ -5,7 +5,7 @@ var projectSchema   = new Schema({
     prj: {
     	type: String
     },
-    tokens: [String],
+    tokens: Array,
     uid: String,
     created: {
     	type: Date,
@@ -16,8 +16,8 @@ var projectSchema   = new Schema({
     	default: null
     },
     labels: {
-    	type: Array,
-    	default: [String]
+    	type: [String],
+    	default: []
     },
     settings: {
     	type: Object,

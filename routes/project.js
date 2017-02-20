@@ -86,7 +86,7 @@ router.route('/settings')
     	console.log(req.body.settings);
 
 			ProjectSchema.findOneAndUpdate({ uid: req.body.uid, prj: req.body.prj }, 
-				{ $set: { settings: req.body.settings, labels: req.body.settings.labels } },
+				{ $set: { settings: req.body.set, labels: req.body.labels } },
 				function(err) {
 						res.json({
 							err: err,
@@ -95,7 +95,6 @@ router.route('/settings')
 				});
     })
 
-     // get all the projects (accessed at GET http://localhost:8080/api/projects)
     .get(function(req, res) {
         ProjectSchema
         	.findOne({ uid: req.query.uid, prj: req.query.prj })
@@ -109,13 +108,12 @@ router.route('/settings')
 
 router.route('/defaultprj')
 
-	.post(function(req, res), {
+	.post(function(req, res) {
 		UserSchema.findOneAndUpdate({ uid: req.body.uid }, { $set: { prj: req.body.prj } },
 		function(err) {
-			if (err)
 				res.json({
 					err: err,
-					message: 'Project did not get saved as default.'
+					message: 'Project was saved as default.'
 				});
 		});
 	});
