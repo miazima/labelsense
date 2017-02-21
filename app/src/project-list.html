@@ -1,7 +1,9 @@
 <link rel="import" href="../bower_components/paper-dropdown-menu/paper-dropdown-menu.html">
 <link rel="import" href="../bower_components/paper-listbox/paper-listbox.html">
+<link rel="import" href="../bower_components/paper-button/paper-button.html">
 <link rel="import" href="../bower_components/paper-item/paper-item.html">
 <link rel="import" href="../bower_components/iron-icon/iron-icon.html">
+<link rel="import" href="../bower_components/hiveoss-common-libraries/moment.html">
 <link rel="import" href="../bower_components/neon-animation/neon-shared-element-animatable-behavior.html">
 <link rel="import" href="theme/shared-styles.html">
 
@@ -41,24 +43,31 @@
 				--iron-icon-fill-color: var(--paper-indigo-500);
 				padding-right: 10px;
 			}
+			div.preview { padding-left: 20px; }
 		</style>
 
 		<div class="settings">
 			<div class="layout horizontal">
 				<iron-icon class="info" icon="info"></iron-icon>
-				<div hidden="{{!projectList}}" class="paper-font-subhead">Choose a project for users to label</div>
-				<div hidden="{{projectList}}" class="paper-font-subhead">Create a project!</div>
+				<div hidden$="[[!_computeInfo(projectList)]]" class="paper-font-subhead">Choose a project for users to label</div>
+				<div hidden$="[[_computeInfo(projectList)]]" class="paper-font-subhead">Create a project!</div>
 			</div>
-			<paper-dropdown-menu label="Switch Current Project" disabled="[[!projectList]]">
-			  <paper-listbox class="dropdown-content" selected="{{defaultProject}}" attr-for-selected="value"> 
-			    <template is="dom-repeat" items={{projectList}}>
-			    	<paper-item value="[[item.prj]]">[[item.prj]]</paper-item>
-			    </template>
-			  </paper-listbox>
-			</paper-dropdown-menu>
+			<div class="layout horizontal">
+				<paper-dropdown-menu label="Switch Current Project" disabled="[[!_computeInfo(projectList)]]">
+				  <paper-listbox class="dropdown-content" selected="{{defaultProject}}" attr-for-selected="value"> 
+				    <template is="dom-repeat" items={{projectList}}>
+				    	<paper-item value="[[item.prj]]">[[item.prj]]</paper-item>
+				    </template>
+				  </paper-listbox>
+				</paper-dropdown-menu>
+
+				<div class="preview self-center">
+					<paper-button class="teal-accent-btn" raised>View Preview</paper-button>
+				</div>
+			</div>
 		</div>
 
-		<div class="layout vertical">
+		<div class="layout vertical" style$="opacity: [[_computeOpacity(projectList)]];">
 			<div class="layout horizontal header">
 				<div class="flex">Project Name</div>
 				<div class="flex">Created</div>
@@ -68,8 +77,8 @@
 			<template is="dom-repeat" items={{projectList}}>
 				<div class="layout horizontal row" on-tap="openSettings">
 					<div class="flex">[[item.prj]]</div>
-					<div class="flex">[[item.created]]</div>
-					<div class="flex">[[item.labels]]</div>
+					<div class="flex">{{parseDateTime(item.created)}}</div>
+					<div class="flex">[[parseLabels(item.labels)]]</div>
 					</div>
 			</template>
 		</div>
@@ -114,9 +123,43 @@
 				}
 			},
 
+			observer: [
+				'init(defaultProject)'
+			],
+
+			init: function(list) {
+				console.log(list);
+			},
+
+			_computeInfo: function(list) {
+				if (!list || list.length === 0) return false;
+				return true;
+			},
+
+			_computeOpacity: function(list) {
+				if (!list || list.length === 0) return 0.4;
+				return 1;
+			},
+
 			_getDefaultProject: function(prj) {
+				if (this.projectList && this.projectList.length === 1) {
+					this.fire('set-default-prj', this.projectList[0].prj);
+					return;
+				}
 				this.fire('set-default-prj', prj);
 			},
+
+			parseLabels: function(labels) {
+				return labels.join(', ');
+			},
+
+			parseDateTime: function(ts) {
+				var two_weeks_ago = moment().subtract(7, 'days');
+        if (moment(ts).isAfter(two_weeks_ago)) {
+          return moment(ts).fromNow() + ' | ' + moment(ts).format('dddd h:mm A');
+        }
+        return moment(ts).format('ddd MMM Do YYYY h:mm A');
+      },
 
 			openSettings: function(event) {
 				var target = event.target;

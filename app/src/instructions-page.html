@@ -1,0 +1,50 @@
+<link rel="import" href="../bower_components/paper-card/paper-card.html">
+<link rel="import" href="theme/shared-styles.html">
+
+<dom-module id="instructions-page">
+	<template>
+		<style include="shared-styles">
+			:host {
+				display: block;
+			}
+			div.button {
+				padding: 20px;
+			}
+			paper-button { 
+				padding-right: 3em; 
+				padding-left: 3em; 
+			}
+		</style>
+
+		<div class="layout vertical center">
+
+			<div class="content-wrapper">
+				<paper-card heading="Instructions">
+				  <div class="card-content layout vertical">
+					  <div>
+					  	Lets write some instructions. You will be provided 100 sentences to label. Read through each sentence carefully and click on the labels that you feel fit the sentence.
+					  </div>
+					  <div class="button self-center">
+					  	<paper-button class="teal-accent-btn" on-tap="routeToLabel" raised>start</paper-button>
+					  </div>
+				  </div>
+				</paper-card>
+			</div>
+<!-- 
+			<div class="layout horizontal justified">
+				<paper-fab icon="arrow-back"></paper-fab>
+				<paper-fab icon="arrow-forward"></paper-fab>
+			</div> -->
+		</div>
+		
+	</template>
+	<script>
+		Polymer({
+			is: 'instructions-page',
+
+			routeToLabel: function () {
+				this.fire('route-page', 'label');
+			}
+		});
+	</script>
+</dom-module>

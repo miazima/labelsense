@@ -9,6 +9,7 @@
 <link rel="import" href="bower_components/app-layout/app-layout.html">
 <link rel="import" href="src/theme/shared-styles.html">
 <link rel="import" href="src/api/api-signin.html">
+<link rel="import" href="src/instructions-page.html">
 <link rel="import" href="src/admin-config.html">
 <link rel="import" href="src/label-page.html">
 
@@ -75,8 +76,9 @@
       </app-toolbar>
     </app-header>
 
-    <neon-animated-pages selected="0" entry-animation="slide-from-right-animation" exit-animation="slide-left-animation">
+    <neon-animated-pages id="page" selected="2" entry-animation="slide-from-right-animation" exit-animation="slide-left-animation">
       <admin-config class="page-wrapper"></admin-config>
+      <instructions-page class="page-wrapper"></instructions-page>
       <label-page class="page-wrapper" tokens="[[tokens]]" tokens-per-page="10" labels='["hello","bye","hello again"]'></label-page>
     </neon-animated-pages>
     
@@ -110,6 +112,17 @@
               }]
             };
           }
+        }
+      },
+
+      listeners: {
+        'route-page': 'routePage'
+      },
+
+      routePage: function(e, page) {
+        switch (page) {
+          case 'label':
+            this.$.page.selected = 2;
         }
       },
 
