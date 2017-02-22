@@ -13,6 +13,7 @@ var upload = multer({
 }).single('file');
 
 var UserSchema = require('../schemas/userSchema');
+var ConfigSchema = require('../schemas/configSchema');
 var ProjectSchema = require('../schemas/projectSchema');
 
 // Applying middleware to all routes in the router
@@ -83,10 +84,13 @@ router.route('/project')
 router.route('/settings')
 
     .post(function(req, res) {
-    	console.log(req.body.settings);
-
 			ProjectSchema.findOneAndUpdate({ uid: req.body.uid, prj: req.body.prj }, 
-				{ $set: { settings: req.body.set, labels: req.body.labels } },
+				{ $set: { 
+					settings: req.body.set, 
+					labels: req.body.labels,
+					updated: Date.now()
+					} 
+				},
 				function(err) {
 						res.json({
 							err: err,
@@ -109,13 +113,39 @@ router.route('/settings')
 router.route('/defaultprj')
 
 	.post(function(req, res) {
-		UserSchema.findOneAndUpdate({ uid: req.body.uid }, { $set: { prj: req.body.prj } },
-		function(err) {
-				res.json({
-					err: err,
-					message: 'Project was saved as default.'
+		// Save the project as default
+		var defaultprj = req.body.prj;
+		UserSchema.findOneAndUpdate({ uid: req.body.uid }, { $set: { prj: defaultprj } });
+		// Retrieve the project settings
+		ProjectSchema
+			.findOne({ prj: defaultprj })
+			.exec(function(err, prj) {
+				if (!prj) return;
+
+				// Set the project config as the default settings
+				ConfigSchema.findOne(function(err, config) {
+					if (!config) {
+						var config = new ConfigSchema();
+						config.save();
+					}
+
+
+					ConfigSchema.findOneAndUpdate({},
+						{ $set: {
+							prj: prj.prj,
+							tokens: prj.tokens,
+							labels: prj.labels,
+							settings: prj.settings
+						} 
+					}, function(err) {
+							res.json({
+								err: err,
+								message: 'Default configuration was saved.'
+							});
+					});
 				});
-		});
+			});
+	
 	});
 
 module.exports = router;

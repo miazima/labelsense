@@ -53,8 +53,7 @@
 
 		<api-signin 
 			id="login"
-      admin="true"
-      on-success="_handleSignInSuccess">
+			admin="[[admin]]">
     </api-signin>
 
 		<div class="border"></div>
@@ -75,7 +74,10 @@
 	      Polymer.NeonSharedElementAnimatableBehavior
 	    ],
 			properties: {
-				
+				admin: {
+					type: Boolean,
+					value: false
+				},
 				sharedElements: {
           value: function() {
             return {

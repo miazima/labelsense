@@ -72,7 +72,14 @@
             computed: '_get(user.uid)',
             notify: true
           },
-          admin: Boolean,
+          admin: {
+            type: Boolean
+          },
+          adminUser: {
+            type: Boolean,
+            computed: '_get(_results2.users.admin)',
+            notify: true
+          },
           signout: {
             type: Boolean,
             value: false
@@ -124,7 +131,8 @@
         },
 
         isAuthenticated:function(auth, uid, email, admin) {
-          if (!uid || !email || !admin) return;
+          if (!uid || !email) return;
+
           if (auth) {
             this.generateRequest();
             this.routeToAppPage();
@@ -136,7 +144,7 @@
         },
 
         _computeBody: function(email, uid, admin) {
-          if (!email || !uid || !admin)
+          if (!email || !uid)
             return;
 
           return {
@@ -157,8 +165,8 @@
         },
 
         _getDefaultProject: function(res) {
-          if (res.users.length === 0 || !res.users[0].prj) return null;
-          return res.users[0].prj;
+          if (!res.users || !res.users.prj) return null;
+          return res.users.prj;
         }
       });
     })();

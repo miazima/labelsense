@@ -62,7 +62,7 @@
 				</paper-dropdown-menu>
 
 				<div class="preview self-center">
-					<paper-button class="teal-accent-btn" raised>View Preview</paper-button>
+					<paper-button class="teal-accent-btn" raised on-tap="routeToLabel">View Preview</paper-button>
 				</div>
 			</div>
 		</div>
@@ -129,6 +129,10 @@
 
 			init: function(list) {
 				console.log(list);
+			},
+
+			routeToLabel: function() {
+				this.fire('route-page', 'label', {bubbles: true});
 			},
 
 			_computeInfo: function(list) {

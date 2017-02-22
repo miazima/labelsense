@@ -54,8 +54,10 @@
 
     <api-signin 
       id="login"
+      uid="{{uid}}" 
+      default-project="{{defaultProject}}"
       user="{{user}}"
-      on-success="_handleSignInSuccess">
+      admin-user="{{adminUser}}">
     </api-signin>
 
     <app-header id="header" reveals>
@@ -67,7 +69,7 @@
           <paper-icon-button icon="settings" class="dropdown-trigger"></paper-icon-button>
           <paper-menu id="settingsMenu" class="dropdown-content">
             <paper-item class="settingsHeader">Hello [[user.displayName]]!</paper-item>
-            <paper-item>App Settings</paper-item>
+            <paper-item hidden$="[[!adminUser]]" on-tap="routeToSettings">App Settings</paper-item>
             <paper-item hidden$="[[!user]]" on-tap="logout">Logout</paper-item>
 <!--             <paper-item>Settings</paper-item>
             <paper-item>Help</paper-item> -->
@@ -76,10 +78,11 @@
       </app-toolbar>
     </app-header>
 
-    <neon-animated-pages id="page" selected="2" entry-animation="slide-from-right-animation" exit-animation="slide-left-animation">
-      <admin-config class="page-wrapper"></admin-config>
+    <neon-animated-pages id="page" selected="0" entry-animation="slide-from-right-animation" exit-animation="slide-left-animation">
+      <admin-config class="page-wrapper" uid="[[uid]]" 
+      default-project="[[defaultProject]]"></admin-config>
       <instructions-page class="page-wrapper"></instructions-page>
-      <label-page class="page-wrapper" tokens="[[tokens]]" tokens-per-page="10" labels='["hello","bye","hello again"]'></label-page>
+      <label-page class="page-wrapper" tokens="[[tokens]]" tokens-per-page="5" labels='["hello","bye","hello again"]'></label-page>
     </neon-animated-pages>
     
   </template>
@@ -91,6 +94,15 @@
         HiveOSS.RouteBehavior
       ],
       properties: {
+        adminUser: {
+          type: Boolean,
+          observer: '_isAdmin'
+        },
+        uid: {
+          type: String,
+          observer: 'getAdminDetails'
+        },
+        defaultProject: String,
         sharedElements: {
           value: function() {
             return {
@@ -117,6 +129,18 @@
 
       listeners: {
         'route-page': 'routePage'
+      },
+
+      getAdminDetails: function() {
+        this.$.login.getUser();
+      },
+
+      _isAdmin: function(admin) {
+        if (!admin) this.$.page.selected = 1;
+      },
+
+      routeToSettings: function() {
+        this.$.page.selected = 0;
       },
 
       routePage: function(e, page) {

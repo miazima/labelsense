@@ -4,21 +4,18 @@ var Schema       = mongoose.Schema;
 var userSchema   = new Schema({
     uid: {
     	type: String,
-        index: {
-            unique: true
-        },
     	unique: true,
         required: true
     },
     email: {
     	type: String,
-        index: {
-            unique: true
-        },
         unique: true,
         required: true
     },
-    admin: Boolean,
+    admin: {
+        type: Boolean,
+        default: false
+    },
     prj: String
 });
 

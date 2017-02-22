@@ -1,6 +1,8 @@
+<link rel="import" href="../bower_components/neon-animation/neon-animation.html">
 <link rel="import" href="../bower_components/paper-card/paper-card.html">
 <link rel="import" href="../bower_components/paper-button/paper-button.html">
 <link rel="import" href="../bower_components/paper-fab/paper-fab.html">
+<link rel="import" href="../bower_components/iron-pages/iron-pages.html">
 <link rel="import" href="theme/shared-styles.html">
 
 <dom-module id="label-page">
@@ -19,27 +21,34 @@
 				padding: 10px 16px;
 			}
 			paper-fab { --paper-fab-background: var(--paper-teal-a700); }
-			.content-wrapper { max-width: 1300px; }
 		</style>
 
-		<div class="layout vertical center">
+		<div class="main-wrapper layout vertical center">
 
-			<div class="content-wrapper">
-				<template is="dom-repeat" items={{tokens}}>
-					<paper-card class="layout vertical">
-					  <div class="card-content">[[item]]</div>
-					  <div class="card-actions layout horizontal wrap end-justified">
-					    <template is="dom-repeat" items={{labels}}>
-					    	<paper-button class="label-btn" toggles>[[item]]</paper-button>
-					    </template>
-					  </div>
-					</paper-card>
-				</template>
+			<div class="paper-font-title self-stretch">Project Name</div>
+
+			<div>
+				<iron-pages selected="{{selectedPage}}">
+					<template is="dom-repeat" items={{splitTokens}}>
+						<div class$="content_[[index]]">
+							<template is="dom-repeat" items={{item}}>
+								<paper-card class="layout vertical">
+								  <div class="card-content">[[item]]</div>
+								  <div class="card-actions layout horizontal  wrap end-justified">
+								    <template is="dom-repeat" items={{labels}}>
+								    	<paper-button class="label-btn" toggles>[[item]]</paper-button>
+								    </template>
+								  </div>
+								</paper-card>
+							</template>
+						</div>
+					</template>
+				</iron-pages>
 			</div>
 
-			<div class="layout horizontal justified">
-				<paper-fab icon="arrow-back"></paper-fab>
-				<paper-fab icon="arrow-forward"></paper-fab>
+			<div class="layout horizontal justified self-stretch">
+				<paper-fab icon="arrow-back" disabled="[[_disableNav(splitTokens,selectedPage,'prev')]]" on-tap="prevPage"></paper-fab>
+				<paper-fab icon="arrow-forward" disabled="[[_disableNav(splitTokens,selectedPage,'next')]]" on-tap="nextPage"></paper-fab>
 			</div>
 		</div>
 		
@@ -48,10 +57,95 @@
 		Polymer({
 			is: 'label-page',
 
+			behaviors: [
+				Polymer.NeonAnimationRunnerBehavior
+			],
+
 			properties: {
 				tokens: Array,
 				tokensPerPage: Number,
-				labels: Array
+				labels: Array,
+				selectedPage: {
+					type: Number,
+					value: 0
+				},
+				splitTokens: Array,
+				animationConfig: {
+					type: Object,
+					value: function() {
+						return {
+							next: [{
+								name: 'slide-from-right-animation',
+								timing: {delay: 200}
+							}, {
+								name: 'fade-out-animation',
+								timing: {duration: 300}
+							}],
+							previous: [{
+								name: 'slide-from-left-animation',
+								timing: {delay: 200}
+							}, {
+								name: 'fade-out-animation',
+								timing: {duration: 300}
+							}]
+						};
+					}
+				}
+			},
+
+			observers: [
+				'computeSplitTokens(tokens,tokensPerPage)'
+			],
+
+			listeners: {
+				'neon-animation-finish': '_onNeonAnimationFinish'
+			},
+
+			_onNeonAnimationFinish: function(e, animation) {
+				// switch (animation) {
+				// 	case 'next': 
+				// 		break;
+				// }
+			},
+
+			computeSplitTokens: function(tokens, chunk) {
+				this.splitTokens = [];
+				var temparray = [];
+
+				for (var i = 0; i < tokens.length; i += chunk) {
+				    temparray.push(tokens.slice(i, i + chunk));
+				}
+				this.splitTokens = temparray;
+			},
+
+			_computeTokens: function(tokens, page) {
+				return tokens[page];
+			},
+
+			_disableNav: function(tokens, page, direction) {
+				if (direction === 'next' && page === tokens.length - 1)
+					return true;
+				if (direction === 'prev' && page === 0)
+					return true;
+				return false;
+			},
+
+			prevPage: function() {
+				this.animationConfig.previous[0].node = this.$$('.content_' + (this.selectedPage - 1));
+				this.animationConfig.previous[1].node = this.$$('.content_' + this.selectedPage );
+				this.playAnimation('previous');
+				this.async(function() {
+					this.selectedPage = this.selectedPage - 1;
+				}, 300);
+			},
+
+			nextPage: function() {
+				this.animationConfig.next[0].node = this.$$('.content_' + (this.selectedPage + 1));
+				this.animationConfig.next[1].node = this.$$('.content_' + this.selectedPage );
+				this.playAnimation('next');
+				this.async(function() {
+					this.selectedPage = this.selectedPage + 1;
+				}, 300);
 			},
 
 			attached: function () {
