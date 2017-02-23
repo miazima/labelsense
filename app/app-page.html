@@ -3,6 +3,7 @@
 <link rel="import" href="bower_components/paper-icon-button/paper-icon-button.html">
 <link rel="import" href="bower_components/paper-menu-button/paper-menu-button.html">
 <link rel="import" href="bower_components/iron-flex-layout/iron-flex-layout.html">
+<link rel="import" href="bower_components/paper-progress/paper-progress.html">
 <link rel="import" href="bower_components/paper-menu/paper-menu.html">
 <link rel="import" href="bower_components/paper-item/paper-item.html">
 <link rel="import" href="bower_components/iron-icons/iron-icons.html">
@@ -19,9 +20,15 @@
       :host {
         display: block;
       }
-      app-header {
+      app-toolbar {
         background-color: var(--paper-teal-500);
+      }
+      app-header {
+        /*@apply(--layout-fixed-top);*/
         color: white;
+        --app-header-background-rear-layer: {
+          background-color: #ef6c00;
+        };
       }
       paper-menu {
         padding-top: 0px;
@@ -38,18 +45,28 @@
         color: red;
       }
       paper-menu-button {
-         --paper-menu-button-dropdown:{
-            width:200px;
-            top:64px !important;
-            right: 0px;
-            left: initial !important;
-          };
+       --paper-menu-button-dropdown:{
+          width:200px;
+          top:64px !important;
+          right: 0px;
+          left: initial !important;
+        };
       }
       .page-wrapper {
         padding: 3em;
-        max-width: 1200px;
+        max-width: 1000px;
         margin: auto;
       }
+      paper-progress {
+        display: block;
+        width: 100%;
+        --paper-progress-active-color: var(--paper-teal-a400);
+        --paper-progress-container-color: rgba(255, 255, 255, 0.5);
+        --paper-progress-transition-duration: 0.08s;
+        --paper-progress-transition-timing-function: ease;
+        --paper-progress-transition-transition-delay: 0s;
+      }
+      /*div.main-content { padding-top: 64px }*/
     </style>
 
     <api-signin 
@@ -64,26 +81,26 @@
       <app-toolbar>
         <paper-icon-button icon="menu" onclick="drawer.toggle()"></paper-icon-button>
         <div main-title>LabelSense</div>
-        <!-- <paper-icon-button icon="settings"></paper-icon-button> -->
         <paper-menu-button vertical-align="top" horizontal-align="right" id="analysisDropdown">
           <paper-icon-button icon="settings" class="dropdown-trigger"></paper-icon-button>
           <paper-menu id="settingsMenu" class="dropdown-content">
             <paper-item class="settingsHeader">Hello [[user.displayName]]!</paper-item>
             <paper-item hidden$="[[!adminUser]]" on-tap="routeToSettings">App Settings</paper-item>
             <paper-item hidden$="[[!user]]" on-tap="logout">Logout</paper-item>
-<!--             <paper-item>Settings</paper-item>
-            <paper-item>Help</paper-item> -->
           </paper-menu>
-      </paper-menu-button>
+        </paper-menu-button>
+        <paper-progress value="[[progress]]" bottom-item></paper-progress>
       </app-toolbar>
     </app-header>
 
-    <neon-animated-pages id="page" selected="0" entry-animation="slide-from-right-animation" exit-animation="slide-left-animation">
-      <admin-config class="page-wrapper" uid="[[uid]]" 
-      default-project="[[defaultProject]]"></admin-config>
-      <instructions-page class="page-wrapper"></instructions-page>
-      <label-page class="page-wrapper" tokens="[[tokens]]" tokens-per-page="5" labels='["hello","bye","hello again"]'></label-page>
-    </neon-animated-pages>
+    <div class="main-content">
+      <neon-animated-pages id="page" selected="[[selectedPage]]" entry-animation="slide-from-right-animation" exit-animation="slide-left-animation">
+        <admin-config class="page-wrapper" uid="[[uid]]" 
+        default-project="[[defaultProject]]"></admin-config>
+        <instructions-page id="instructions" class="page-wrapper"></instructions-page>
+        <label-page class="page-wrapper" tokens="[[tokens]]" tokens-per-page="3" labels='["hello","bye","hello again"]'></label-page>
+      </neon-animated-pages>
+    </div>
     
   </template>
   <script>
@@ -94,6 +111,11 @@
         HiveOSS.RouteBehavior
       ],
       properties: {
+        selectedPage: Number,
+        progress: {
+          type: Number,
+          value: 20
+        },
         adminUser: {
           type: Boolean,
           observer: '_isAdmin'
@@ -124,11 +146,20 @@
               }]
             };
           }
+        },
+        spec: {
+          type: Object,
+          value: function() {
+            return {
+              title: 'Thank you!'
+            };
+          }
         }
       },
 
       listeners: {
-        'route-page': 'routePage'
+        'route-page': 'routePage',
+        'progress-bar': '_progressBar'
       },
 
       getAdminDetails: function() {
@@ -136,17 +167,31 @@
       },
 
       _isAdmin: function(admin) {
-        if (!admin) this.$.page.selected = 1;
+        console.log(admin);
+        if (!admin) {
+          this.selectedPage = 2;
+          return;
+        }
+        this.selectedPage = 0;
+      },
+
+      _progressBar: function(e, value) {
+        this.progress = value;
       },
 
       routeToSettings: function() {
-        this.$.page.selected = 0;
+        this.selectedPage = 0;
       },
 
       routePage: function(e, page) {
         switch (page) {
           case 'label':
-            this.$.page.selected = 2;
+            this.selectedPage = 2;
+            break;
+          case 'thankyou':
+            this.$.instructions.spec = this.spec;
+            this.selectedPage = 1;
+            break;
         }
       },
 

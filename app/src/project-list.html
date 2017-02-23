@@ -1,10 +1,13 @@
+<link rel="import" href="../bower_components/neon-animation/neon-animation.html">
+<link rel="import" href="../bower_components/neon-animation/neon-shared-element-animatable-behavior.html">
+<link rel="import" href="../bower_components/neon-animation/neon-animation-runner-behavior.html">
 <link rel="import" href="../bower_components/paper-dropdown-menu/paper-dropdown-menu.html">
+<link rel="import" href="../bower_components/paper-icon-button/paper-icon-button.html">
 <link rel="import" href="../bower_components/paper-listbox/paper-listbox.html">
 <link rel="import" href="../bower_components/paper-button/paper-button.html">
 <link rel="import" href="../bower_components/paper-item/paper-item.html">
 <link rel="import" href="../bower_components/iron-icon/iron-icon.html">
 <link rel="import" href="../bower_components/hiveoss-common-libraries/moment.html">
-<link rel="import" href="../bower_components/neon-animation/neon-shared-element-animatable-behavior.html">
 <link rel="import" href="theme/shared-styles.html">
 
 <dom-module id="project-list">
@@ -44,6 +47,16 @@
 				padding-right: 10px;
 			}
 			div.preview { padding-left: 20px; }
+			paper-icon-button.actions {
+				color: var(--paper-grey-500);
+			}
+			paper-icon-button.export:hover {
+				color: var(--paper-teal-a700);
+			}
+			paper-icon-button.delete:hover {
+				color: var(--paper-red-500);
+			}
+			span#export { color: var(--paper-teal-500) }
 		</style>
 
 		<div class="settings">
@@ -72,14 +85,22 @@
 				<div class="flex">Project Name</div>
 				<div class="flex">Created</div>
 				<div class="flex">Labels</div>
+				<div class="flex"></div>
 			</div>
 
 			<template is="dom-repeat" items={{projectList}}>
 				<div class="layout horizontal row" on-tap="openSettings">
-					<div class="flex">[[item.prj]]</div>
-					<div class="flex">{{parseDateTime(item.created)}}</div>
-					<div class="flex">[[parseLabels(item.labels)]]</div>
+					<div class="flex self-center">[[item.prj]]</div>
+					<div class="flex self-center">{{parseDateTime(item.created)}}</div>
+					<div class="flex self-center">[[parseLabels(item.labels)]]</div>
+					<div class="flex self-center layout horizontal">
+						<paper-icon-button class="actions delete" icon="delete"></paper-icon-button>
+						<div class="layout horizontal self-stretch" on-mouseover="_showExport" on-mouseout="_hideExport">
+							<paper-icon-button class="actions export" icon="file-download"></paper-icon-button>
+							<div hidden class$="export_[[index]] self-center"><span id="export" class="paper-font-button">Export</span></div>
+						</div>
 					</div>
+				</div>
 			</template>
 		</div>
 		
@@ -89,7 +110,8 @@
 			is: 'project-list',
 
 			behaviors: [
-	      Polymer.NeonSharedElementAnimatableBehavior
+	      Polymer.NeonSharedElementAnimatableBehavior,
+	      Polymer.NeonAnimationRunnerBehavior
 	    ],
 
 			properties: {
@@ -101,14 +123,19 @@
 					type: Array
 				},
 				defaultProject: {
-					type: String,
-					observer: '_getDefaultProject'
+					type: String
 				},
 				uid: String,
 				animationConfig: {
 					type: Object,
 					value: function() {
 						return {
+							'exportEntry': {
+								name: 'fade-in-animation'
+							},
+							'exportExit': {
+								name: 'fade-out-animation'
+							},
 							'exit': [{
 	              name: 'ripple-animation',
 	              id: 'ripple',
@@ -123,12 +150,47 @@
 				}
 			},
 
-			observer: [
-				'init(defaultProject)'
+			listeners: {
+				'neon-animation-finish': '_onNeonAnimationFinish'
+			},
+
+			observers: [
+				'_getDefaultProject(defaultProject,projectList)'
 			],
 
-			init: function(list) {
-				console.log(list);
+			_onNeonAnimationFinish: function(e, animation) {
+				switch (animation.name) {
+					case 'exportExit': 
+						this.$$('.export_' + animation.index).hidden = true;
+						break;
+					case 'exportEntry': 
+						this.$$('.export_' + animation.index).hidden = false;
+						break;
+				}
+			},
+
+			_showExport: function(e) {
+				console.log('enter');
+				
+				var index = e.model.index;
+				this.$$('.export_' + index).hidden = false;
+				this.animationConfig.exportEntry.node = this.$$('.export_' + index);
+				this.playAnimation('exportEntry', {
+					name:'exportEntry',
+					index: index
+				});
+			},
+
+			_hideExport: function(e) {
+				var index = e.model.index;
+				this.animationConfig.exportExit.node = this.$$('.export_' + index);
+				this.async(function() {
+					console.log('exit');
+					this.playAnimation('exportExit', {
+						name:'exportExit',
+						index: index
+					});
+				}, 300);
 			},
 
 			routeToLabel: function() {
@@ -145,9 +207,9 @@
 				return 1;
 			},
 
-			_getDefaultProject: function(prj) {
-				if (this.projectList && this.projectList.length === 1) {
-					this.fire('set-default-prj', this.projectList[0].prj);
+			_getDefaultProject: function(prj, list) {
+				if (list && list.length === 1) {
+					this.fire('set-default-prj', list[0].prj);
 					return;
 				}
 				this.fire('set-default-prj', prj);

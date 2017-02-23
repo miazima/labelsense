@@ -45,9 +45,12 @@
 			.border {
 				height: 64px;
 			}
-			paper-button.accent-btn { padding: 12px 18px; }
+			paper-button.teal-accent-btn { padding: 12px 24px; }
 			div#signin {
 				padding: 20px ;
+			}
+			.teal-accent-btn#signinbtn {
+				background: var(--paper-teal-400);
 			}
 		</style>
 
@@ -58,7 +61,7 @@
 
 		<div class="border"></div>
     <header id="landing">
-      <h2>Welcome To Our Landing Page</h2>
+      <h2>Welcome To LabelSense</h2>
       <div id="signin">
       	<paper-button id="signinbtn" class="teal-accent-btn" on-tap="login" raised>Sign in</paper-button>
       </div>

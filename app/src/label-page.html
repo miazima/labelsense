@@ -11,9 +11,6 @@
 			:host {
 				display: block;
 			}
-			paper-card {
-				margin: 30px;
-			}
 			paper-button[toggles][active] {
 			  background: var(--paper-indigo-500);
 			}
@@ -21,6 +18,14 @@
 				padding: 10px 16px;
 			}
 			paper-fab { --paper-fab-background: var(--paper-teal-a700); }
+			.teal-accent-btn { 
+				padding-left: 30px; 
+				padding-right: 30px; 
+			}
+			.main-wrapper { padding-bottom: 3em; }
+			div.token {
+				margin: 30px;
+			}
 		</style>
 
 		<div class="main-wrapper layout vertical center">
@@ -29,18 +34,20 @@
 
 			<div>
 				<iron-pages selected="{{selectedPage}}">
-					<template is="dom-repeat" items={{splitTokens}}>
+					<template id="firstRepeat" is="dom-repeat" items={{splitTokens}}>
 						<div class$="content_[[index]]">
-							<template is="dom-repeat" items={{item}}>
-								<paper-card class="layout vertical">
-								  <div class="card-content">[[item]]</div>
-								  <div class="card-actions layout horizontal  wrap end-justified">
-								    <template is="dom-repeat" items={{labels}}>
-								    	<paper-button class="label-btn" toggles>[[item]]</paper-button>
-								    </template>
-								  </div>
-								</paper-card>
+							<template class$="secondRepeat_[[index]]" is="dom-repeat" items={{item}}>
+								<div class="token layout horizontal">
+									<paper-card class="layout vertical">
+									  <div class="card-content">[[item]]</div>
+									</paper-card>
+								 <div class="layout vertical">
+								 	<template is="dom-repeat" items={{labels}}>
+							    	<paper-button class="label-btn" on-tap="updateData" toggles>[[item]]</paper-button>
+							    </template>
+								 </div>
 							</template>
+								</div>
 						</div>
 					</template>
 				</iron-pages>
@@ -50,7 +57,13 @@
 				<paper-fab icon="arrow-back" disabled="[[_disableNav(splitTokens,selectedPage,'prev')]]" on-tap="prevPage"></paper-fab>
 				<paper-fab icon="arrow-forward" disabled="[[_disableNav(splitTokens,selectedPage,'next')]]" on-tap="nextPage"></paper-fab>
 			</div>
+
+			<div class="layout vertical" hidden$="[[_displaySave(splitTokens,selectedPage)]]">
+				<div class="self-center"><paper-button class="teal-accent-btn" on-tap="_submitLabels" raised>submit</paper-button></div>
+			</div>
 		</div>
+
+		
 		
 	</template>
 	<script>
@@ -69,6 +82,7 @@
 					type: Number,
 					value: 0
 				},
+				labelData: Array,
 				splitTokens: Array,
 				animationConfig: {
 					type: Object,
@@ -106,6 +120,25 @@
 				// 	case 'next': 
 				// 		break;
 				// }
+			},
+
+			_displaySave: function(tokens, page) {
+				if (page !== tokens.length - 1) return true;
+				return false;
+			},
+
+			_submitLabels: function() {
+				// this.fire('route-page', 'thankyou', {bubbles: true});
+			},
+
+			updateData: function(e) {
+				var page = this.$.firstRepeat.modelForElement(e.target).index;
+				var token = this.$$('.secondRepeat_' + page).modelForElement(e.target).index;
+				tokenID = (this.tokensPerPage * page) + token;
+				var label = e.model.item;
+				// console.log(this.$.firstRepeat.modelForElement(e.target).index);
+				// console.log(this.$$('.secondRepeat_' + this.$.firstRepeat.modelForElement(e.target).index).modelForElement(e.target).index);
+				// console.log(e.model.index, e.model.item);
 			},
 
 			computeSplitTokens: function(tokens, chunk) {
@@ -146,6 +179,9 @@
 				this.async(function() {
 					this.selectedPage = this.selectedPage + 1;
 				}, 300);
+
+				var progress = this.selectedPage * 20;
+				this.fire('progress-bar', progress, {bubbles: true});
 			},
 
 			attached: function () {
@@ -161,35 +197,7 @@
         "Months on ye at by esteem desire warmth former. Sure that that way gave any fond now. His boy middleton sir nor engrossed affection excellent. Dissimilar compliment cultivated preference eat sufficient may. Well next door soon we mr he four. Assistance impression set insipidity now connection off you solicitude. Under as seems we me stuff those style at. Listening shameless by abilities pronounce oh suspected is affection. Next it draw in draw much bred.",
         "And produce say the ten moments parties. Simple innate summer fat appear basket his desire joy. Outward clothes promise at gravity do excited. Sufficient particular impossible by reasonable oh expression is. Yet preference connection unpleasant yet melancholy but end appearance. And excellence partiality estimating terminated day everything.",
         "To sure calm much most long me mean. Able rent long in do we. Uncommonly no it announcing melancholy an in. Mirth learn it he given. Secure shy favour length all twenty denote. He felicity no an at packages answered opinions juvenile.",
-        "Examine she brother prudent add day ham. Far stairs now coming bed oppose hunted become his. You zealously departure had procuring suspicion. Books whose front would purse if be do decay. Quitting you way formerly disposed perceive ladyship are. Common turned boy direct and yet.",
-        "Resources exquisite set arranging moonlight sex him household had. Months had too ham cousin remove far spirit. She procuring the why performed continual improving. Civil songs so large shade in cause. Lady an mr here must neat sold. Children greatest ye extended delicate of. No elderly passage earnest as in removed winding or.",
-        "Now seven world think timed while her. Spoil large oh he rooms on since an. Am up unwilling eagerness perceived incommode. Are not windows set luckily musical hundred can. Collecting if sympathize middletons be of of reasonably. Horrible so kindness at thoughts exercise no weddings subjects. The mrs gay removed towards journey chapter females offered not. Led distrusts otherwise who may newspaper but. Last he dull am none he mile hold as.",
-        "Unpacked reserved sir offering bed judgment may and quitting speaking. Is do be improved raptures offering required in replying raillery. Stairs ladies friend by in mutual an no. Mr hence chief he cause. Whole no doors on hoped. Mile tell if help they ye full name.",
-        "Although moreover mistaken kindness me feelings do be marianne. Son over own nay with tell they cold upon are. Cordial village and settled she ability law herself. Finished why bringing but sir bachelor unpacked any thoughts. Unpleasing unsatiable particular inquietude did nor sir. Get his declared appetite distance his together now families. Friends am himself at on norland it viewing. Suspected elsewhere you belonging continued commanded she.",
-        "Improve ashamed married expense bed her comfort pursuit mrs. Four time took ye your as fail lady. Up greatest am exertion or marianne. Shy occasional terminated insensible and inhabiting gay. So know do fond to half on. Now who promise was justice new winding. In finished on he speaking suitable advanced if. Boy happiness sportsmen say prevailed offending concealed nor was provision. Provided so as doubtful on striking required. Waiting we to compass assured.",
-        "Luckily friends do ashamed to do suppose. Tried meant mr smile so. Exquisite behaviour as to middleton perfectly. Chicken no wishing waiting am. Say concerns dwelling graceful six humoured. Whether mr up savings talking an. Active mutual nor father mother exeter change six did all.",
-        "From they fine john he give of rich he. They age and draw mrs like. Improving end distrusts may instantly was household applauded incommode. Why kept very ever home mrs. Considered sympathize ten uncommonly occasional assistance sufficient not. Letter of on become he tended active enable to. Vicinity relation sensible sociable surprise screened no up as.",
-        "At distant inhabit amongst by. Appetite welcomed interest the goodness boy not. Estimable education for disposing pronounce her. John size good gay plan sent old roof own. Inquietude saw understood his friendship frequently yet. Nature his marked ham wished.",
-        "Tolerably earnestly middleton extremely distrusts she boy now not. Add and offered prepare how cordial two promise. Greatly who affixed suppose but enquire compact prepare all put. Added forth chief trees but rooms think may. Wicket do manner others seemed enable rather in. Excellent own discovery unfeeling sweetness questions the gentleman. Chapter shyness matters mr parlors if mention thought.",
-        "Article nor prepare chicken you him now. Shy merits say advice ten before lovers innate add. She cordially behaviour can attempted estimable. Trees delay fancy noise manor do as an small. Felicity now law securing breeding likewise extended and. Roused either who favour why ham.",
-        "John draw real poor on call my from. May she mrs furnished discourse extremely. Ask doubt noisy shade guest did built her him. Ignorant repeated hastened it do. Consider bachelor he yourself expenses no. Her itself active giving for expect vulgar months. Discovery commanded fat mrs remaining son she principle middleton neglected. Be miss he in post sons held. No tried is defer do money scale rooms.",
-        "Passage its ten led hearted removal cordial. Preference any astonished unreserved mrs. Prosperous understood middletons in conviction an uncommonly do. Supposing so be resolving breakfast am or perfectly. Is drew am hill from mr. Valley by oh twenty direct me so. Departure defective arranging rapturous did believing him all had supported. Family months lasted simple set nature vulgar him. Picture for attempt joy excited ten carried manners talking how. Suspicion neglected he resolving agreement perceived at an.",
-        "Name were we at hope. Remainder household direction zealously the unwilling bed sex. Lose and gay ham sake met that. Stood her place one ten spoke yet. Head case knew ever set why over. Marianne returned of peculiar replying in moderate. Roused get enable garret estate old county. Entreaties you devonshire law dissimilar terminated.",
-        "Put all speaking her delicate recurred possible. Set indulgence inquietude discretion insensible bed why announcing. Middleton fat two satisfied additions. So continued he or commanded household smallness delivered. Door poor on do walk in half. Roof his head the what.",
-        "Whether article spirits new her covered hastily sitting her. Money witty books nor son add. Chicken age had evening believe but proceed pretend mrs. At missed advice my it no sister. Miss told ham dull knew see she spot near can. Spirit her entire her called.",
-        "She literature discovered increasing how diminution understood. Though and highly the enough county for man. Of it up he still court alone widow seems. Suspected he remainder rapturous my sweetness. All vanity regard sudden nor simple can. World mrs and vexed china since after often.",
-        "Fulfilled direction use continual set him propriety continued. Saw met applauded favourite deficient engrossed concealed and her. Concluded boy perpetual old supposing. Farther related bed and passage comfort civilly. Dashwoods see frankness objection abilities the. As hastened oh produced prospect formerly up am. Placing forming nay looking old married few has. Margaret disposed add screened rendered six say his striking confined.",
-        "For though result and talent add are parish valley. Songs in oh other avoid it hours woman style. In myself family as if be agreed. Gay collected son him knowledge delivered put. Added would end ask sight and asked saw dried house. Property expenses yourself occasion endeavor two may judgment she. Me of soon rank be most head time tore. Colonel or passage to ability.",
-        "When be draw drew ye. Defective in do recommend suffering. House it seven in spoil tiled court. Sister others marked fat missed did out use. Alteration possession dispatched collecting instrument travelling he or on. Snug give made at spot or late that mr.",
-        "Considered an invitation do introduced sufficient understood instrument it. Of decisively friendship in as collecting at. No affixed be husband ye females brother garrets proceed. Least child who seven happy yet balls young. Discovery sweetness principle discourse shameless bed one excellent. Sentiments of surrounded friendship dispatched connection is he. Me or produce besides hastily up as pleased. Bore less when had and john shed hope.",
-        "Those an equal point no years do. Depend warmth fat but her but played. Shy and subjects wondered trifling pleasant. Prudent cordial comfort do no on colonel as assured chicken. Smart mrs day which begin. Snug do sold mr it if such. Terminated uncommonly at at estimating. Man behaviour met moonlight extremity acuteness direction.",
-        "Sportsman delighted improving dashwoods gay instantly happiness six. Ham now amounted absolute not mistaken way pleasant whatever. At an these still no dried folly stood thing. Rapid it on hours hills it seven years. If polite he active county in spirit an. Mrs ham intention promotion engrossed assurance defective. Confined so graceful building opinions whatever trifling in. Insisted out differed ham man endeavor expenses. At on he total their he songs. Related compact effects is on settled do.",
-        "Travelling alteration impression six all uncommonly. Chamber hearing inhabit joy highest private ask him our believe. Up nature valley do warmly. Entered of cordial do on no hearted. Yet agreed whence and unable limits. Use off him gay abilities concluded immediate allowance.",
-        "In to am attended desirous raptures declared diverted confined at. Collected instantly remaining up certainly to necessary as. Over walk dull into son boy door went new. At or happiness commanded daughters as. Is handsome an declared at received in extended vicinity subjects. Into miss on he over been late pain an. Only week bore boy what fat case left use. Match round scale now sex style far times. Your me past an much.",
-        "Give lady of they such they sure it. Me contained explained my education. Vulgar as hearts by garret. Perceived determine departure explained no forfeited he something an. Contrasted dissimilar get joy you instrument out reasonably. Again keeps at no meant stuff. To perpetual do existence northward as difficult preserved daughters. Continued at up to zealously necessary breakfast. Surrounded sir motionless she end literature. Gay direction neglected but supported yet her.",
-        "Sing long her way size. Waited end mutual missed myself the little sister one. So in pointed or chicken cheered neither spirits invited. Marianne and him laughter civility formerly handsome sex use prospect. Hence we doors is given rapid scale above am. Difficult ye mr delivered behaviour by an. If their woman could do wound on. You folly taste hoped their above are and but.",
-        "Am if number no up period regard sudden better. Decisively surrounded all admiration and not you. Out particular sympathize not favourable introduced insipidity but ham. Rather number can and set praise. Distrusts an it contented perceived attending oh. Thoroughly estimating introduced stimulated why but motionless.",
-        "On it differed repeated wandered required in. Then girl neat why yet knew rose spot. Moreover property we he kindness greatest be oh striking laughter. In me he at collecting affronting principles apartments. Has visitor law attacks pretend you calling own excited painted. Contented attending smallness it oh ye unwilling. Turned favour man two but lovers. Suffer should if waited common person little oh. Improved civility graceful sex few smallest screened settling. Likely active her warmly has."
+        "Examine she brother prudent add day ham. Far stairs now coming bed oppose hunted become his. You zealously departure had procuring suspicion. Books whose front would purse if be do decay. Quitting you way formerly disposed perceive ladyship are. Common turned boy direct and yet."
       ];
 			}
 		});

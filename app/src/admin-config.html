@@ -5,7 +5,6 @@
 <link rel="import" href="./upload-component.html">
 <link rel="import" href="./project-page.html">
 <link rel="import" href="theme/shared-styles.html">
-<!-- <link rel="import" href="api/api-signin.html"> -->
 
 <dom-module id="admin-config">
 	<template>
@@ -25,8 +24,6 @@
 	    }
 		</style>
 
-<!-- 		<api-signin id="signin" uid="{{uid}}" default-project="{{defaultProject}}"></api-signin>
- -->
 		<!-- <div class="paper-font-headline">Configure Labelling Environment</div> -->
 		<paper-card class="neon-paper-card layout vertical" elevation="1" animated-shadow>
 		  <paper-tabs selected="{{selectedTab}}">
@@ -56,8 +53,6 @@
 					type: String
 				}
 			},
-
-			
 
 			_displayList: function() {
 				this.selectedTab = 1;

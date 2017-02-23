@@ -30,11 +30,6 @@
 				  </div>
 				</paper-card>
 			</div>
-<!-- 
-			<div class="layout horizontal justified">
-				<paper-fab icon="arrow-back"></paper-fab>
-				<paper-fab icon="arrow-forward"></paper-fab>
-			</div> -->
 		</div>
 		
 	</template>
@@ -42,8 +37,19 @@
 		Polymer({
 			is: 'instructions-page',
 
+			properties: {
+				spec: {
+					type: Object,
+					observer: '_customPage'
+				}
+			},
+
 			routeToLabel: function () {
 				this.fire('route-page', 'label');
+			},
+
+			_customPage: function(spec) {
+				console.log(spec);
 			}
 		});
 	</script>
