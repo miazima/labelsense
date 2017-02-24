@@ -98,7 +98,7 @@
         <admin-config class="page-wrapper" uid="[[uid]]" 
         default-project="[[defaultProject]]"></admin-config>
         <instructions-page id="instructions" class="page-wrapper"></instructions-page>
-        <label-page class="page-wrapper" tokens="[[tokens]]" tokens-per-page="3" labels='["hello","bye","hello again"]'></label-page>
+        <label-page class="page-wrapper" tokens="[[tokens]]" tokens-per-page="3" labels='["hello","bye","hello again","bye again"]'></label-page>
       </neon-animated-pages>
     </div>
     
@@ -169,7 +169,7 @@
       _isAdmin: function(admin) {
         console.log(admin);
         if (!admin) {
-          this.selectedPage = 2;
+          this.selectedPage = 1;
           return;
         }
         this.selectedPage = 0;
