@@ -1,0 +1,49 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/iron-ajax/iron-ajax.html">
+<link rel="import" href="./api-behavior.html">
+
+<dom-module id="api-config">
+  <template>
+
+    <iron-ajax id="xhr"
+        url="[[url]]"
+        method="GET"
+        handle-as="json"
+        content-type="application/json"
+        params="[[_params]]"
+        loading="{{loading}}"
+        last-error="{{_ajaxError}}"
+        last-response="{{_results}}"></iron-ajax>
+
+  </template>
+
+  <script>
+    (function() {
+      'use strict';
+
+      Polymer({
+        is: 'api-config',
+        behaviors: [
+          HiveOSS.ApiBehavior
+        ],
+        properties: {
+          url: {
+            type: String,
+            value: 'api/config'
+          },
+          valid: {
+            type: Boolean,
+            notify: true,
+            value: true
+          },
+          config: {
+            type: Object,
+            computed: '_get(_results.config)',
+            notify: true,
+            readonly: true
+          }
+        }
+      });
+    })();
+  </script>
+</dom-module>

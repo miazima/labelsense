@@ -208,6 +208,7 @@
 			},
 
 			_getDefaultProject: function(prj, list) {
+				if (typeof prj !== 'string') return;
 				if (list && list.length === 1) {
 					this.fire('set-default-prj', list[0].prj);
 					return;

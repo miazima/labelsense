@@ -1,7 +1,7 @@
 // ROUTES FOR OUR API
 // =============================================================================
 var express = require('express');  
-var router = express.Router();              // get an instance of the express Router
+var router = express.Router();
 
 var ConfigSchema = require('../schemas/configSchema');
 
@@ -23,16 +23,13 @@ router.route('/config')
         });
     })
 
-     // get all the users (accessed at GET http://localhost:8080/api/users)
     .get(function(req, res) {
-        ConfigSchema.find(function(err, config) {
-            if (err)
-                res.send(err);
-
-            res.json({
-              err: err,
-              config: config
-            });
+      ConfigSchema.findOne()
+        .exec(function(err, config) {
+          res.json({
+            err: err,
+            config: config
+          });
         });
     });
 

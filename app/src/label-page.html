@@ -1,8 +1,12 @@
 <link rel="import" href="../bower_components/neon-animation/neon-animation.html">
-<link rel="import" href="../bower_components/paper-card/paper-card.html">
+<link rel="import" href="../bower_components/paper-listbox/paper-listbox.html">
+<link rel="import" href="../bower_components/paper-ripple/paper-ripple.html">
 <link rel="import" href="../bower_components/paper-button/paper-button.html">
+<link rel="import" href="../bower_components/paper-item/paper-item.html">
+<link rel="import" href="../bower_components/paper-card/paper-card.html">
 <link rel="import" href="../bower_components/paper-fab/paper-fab.html">
 <link rel="import" href="../bower_components/iron-pages/iron-pages.html">
+<link rel="import" href="api/api-label.html">
 <link rel="import" href="theme/shared-styles.html">
 
 <dom-module id="label-page">
@@ -14,6 +18,18 @@
 			paper-button[toggles][active] {
 			  background: var(--paper-indigo-500);
 			}
+			paper-listbox.labelbox {
+        padding: 0;
+      }
+      paper-listbox.labelbox > paper-item {
+	      --paper-item: {
+	        background: var(--paper-indigo-300);
+	        color: white;
+	        position: relative;
+	      }
+	      --paper-item-selected: { background: var(--paper-indigo-500); }
+	      --paper-item-focused-before: { opacity: 0; }
+      }
 			.card-actions {
 				padding: 10px 16px;
 			}
@@ -26,36 +42,62 @@
 			div.token {
 				margin: 30px;
 			}
+			div.nav { 
+				width: 50px;
+				position: relative;
+				/*height: calc(100vh - 64px - 3em);*/
+			}
+			div.navfix { position: fixed; }
+			paper-fab.nav {
+				position: absolute;
+				top: 50%;
+				left: calc(50% - 28px);
+			}
+			div.content-wrapper { overflow: hidden; }
 		</style>
 
-		<div class="main-wrapper layout vertical center">
+		<api-label id="label" uid=[[uid]] prj=[[prj]] labelData="[[labelData]]"></api-label>
 
-			<div class="paper-font-title self-stretch">Project Name</div>
+		<div class="main-content-wrapper layout vertical">
 
-			<div>
-				<iron-pages selected="{{selectedPage}}">
-					<template id="firstRepeat" is="dom-repeat" items={{splitTokens}}>
-						<div class$="content_[[index]]">
-							<template class$="secondRepeat_[[index]]" is="dom-repeat" items={{item}}>
-								<div class="token layout horizontal">
-									<paper-card class="layout vertical">
-									  <div class="card-content">[[item]]</div>
-									</paper-card>
-								 <div class="layout vertical">
-								 	<template is="dom-repeat" items={{labels}}>
-							    	<paper-button class="label-btn" on-tap="updateData" toggles>[[item]]</paper-button>
-							    </template>
-								 </div>
-							</template>
+			<div class="content-wrapper paper-font-title self-center">[[prj]]</div>
+
+			<div class="layout horizontal">
+
+				<div class="nav flex">
+					<paper-fab class="nav" icon="arrow-back" disabled="[[_disableNav(splitTokens,selectedPage,'prev')]]" on-tap="prevPage"></paper-fab>
+				</div>
+
+				<div class="content-wrapper">
+					<iron-pages selected="{{selectedPage}}">
+						<template id="firstRepeat" is="dom-repeat" items={{splitTokens}}>
+							<div class$="content_[[index]]">
+								<template class$="secondRepeat_[[index]]" is="dom-repeat" items={{item}}>
+									<div class="token layout horizontal">
+										<paper-card class="flex-6">
+										  <div class="card-content">[[item]]</div>
+										</paper-card>
+									 	<paper-listbox multi=[[multiSelect]] class$="labelbox flex-1 list_[[index]]" attr-for-selected="value">
+									 		<template is="dom-repeat" items={{labels}}>
+									 			<!-- <paper-item>[[item]]</paper-item> -->
+										 		<paper-item value$="[[item]]" raised class="paper-font-button layout horizontal center-justified">
+											 		[[item]]<paper-ripple></paper-ripple>
+										 		</paper-item>
+									    </template>
+									 	</paper-listbox>
+									</div>
+								</template>
 							</div>
-						</div>
-					</template>
-				</iron-pages>
-			</div>
+						</template>
+					</iron-pages>
+				</div>
 
-			<div class="layout horizontal justified self-stretch">
-				<paper-fab icon="arrow-back" disabled="[[_disableNav(splitTokens,selectedPage,'prev')]]" on-tap="prevPage"></paper-fab>
-				<paper-fab icon="arrow-forward" disabled="[[_disableNav(splitTokens,selectedPage,'next')]]" on-tap="nextPage"></paper-fab>
+				<!-- <div class="layout horizontal justified self-stretch"> -->
+					
+				<div class="nav flex">
+					<paper-fab class="nav" icon="arrow-forward" disabled="[[_disableNav(splitTokens,selectedPage,'next')]]" on-tap="nextPage"></paper-fab>
+				</div>
+				<!-- </div> -->
 			</div>
 
 			<div class="layout vertical" hidden$="[[_displaySave(splitTokens,selectedPage)]]">
@@ -75,7 +117,12 @@
 			],
 
 			properties: {
-				tokens: Array,
+				uid: String,
+				prj: String,
+				tokens: {
+					type: Array,
+					observer: '_initData'
+				},
 				tokensPerPage: Number,
 				labels: Array,
 				selectedPage: {
@@ -84,6 +131,10 @@
 				},
 				labelData: Array,
 				splitTokens: Array,
+				multiSelect: {
+					type: Boolean,
+					value: true
+				},
 				animationConfig: {
 					type: Object,
 					value: function() {
@@ -122,23 +173,37 @@
 				// }
 			},
 
+			_initData: function(tk) {
+				this.labelData =  tk.map(function(d) {
+					return {};
+				});
+			},
+
 			_displaySave: function(tokens, page) {
 				if (page !== tokens.length - 1) return true;
 				return false;
 			},
 
-			_submitLabels: function() {
-				// this.fire('route-page', 'thankyou', {bubbles: true});
+			_checkLabelData: function() {
+				var data = this.labelData;
+				var check = true;
+
+				for (var i = 0; i < data.length; i++) {
+					if (!data[i].labels || data[i].labels.length === 0) check = false;
+				}
+				return check;
 			},
 
-			updateData: function(e) {
-				var page = this.$.firstRepeat.modelForElement(e.target).index;
-				var token = this.$$('.secondRepeat_' + page).modelForElement(e.target).index;
-				tokenID = (this.tokensPerPage * page) + token;
-				var label = e.model.item;
-				// console.log(this.$.firstRepeat.modelForElement(e.target).index);
-				// console.log(this.$$('.secondRepeat_' + this.$.firstRepeat.modelForElement(e.target).index).modelForElement(e.target).index);
-				// console.log(e.model.index, e.model.item);
+			_submitLabels: function() {
+				for (var i = 0; i < this.tokens.length; i++) {
+					this.labelData[i] = {
+						docID: i,
+						labels: this.$$('.list_' + i).selectedValues
+					};
+				}
+				if (!this._checkLabelData()) return;
+				this.$.label.submitData(this.labelData);
+				this.fire('route-page', 'thankyou', {bubbles: true});
 			},
 
 			computeSplitTokens: function(tokens, chunk) {
@@ -182,23 +247,6 @@
 
 				var progress = this.selectedPage * 20;
 				this.fire('progress-bar', progress, {bubbles: true});
-			},
-
-			attached: function () {
-				this.tokens = [
-        "Excited him now natural saw passage offices you minuter. At by asked being court hopes. Farther so friends am to detract. Forbade concern do private be. Offending residence but men engrossed shy. Pretend am earnest offered arrived company so on. Felicity informed yet had admitted strictly how you.",
-        "But why smiling man her imagine married. Chiefly can man her out believe manners cottage colonel unknown. Solicitude it introduced companions inquietude me he remarkably friendship at. My almost or horses period. Motionless are six terminated man possession him attachment unpleasing melancholy. Sir smile arose one share. No abroad in easily relied an whence lovers temper by. Looked wisdom common he an be giving length mr.",
-        "Same an quit most an. Admitting an mr disposing sportsmen. Tried on cause no spoil arise plate. Longer ladies valley get esteem use led six. Middletons resolution advantages expression themselves partiality so me at. West none hope if sing oh sent tell is.",
-        "At distant inhabit amongst by. Appetite welcomed interest the goodness boy not. Estimable education for disposing pronounce her. John size good gay plan sent old roof own. Inquietude saw understood his friendship frequently yet. Nature his marked ham wished.",
-        "Or neglected agreeable of discovery concluded oh it sportsman. Week to time in john. Son elegance use weddings separate. Ask too matter formed county wicket oppose talent. He immediate sometimes or to dependent in. Everything few frequently discretion surrounded did simplicity decisively. Less he year do with no sure loud.",
-        "Whole wound wrote at whose to style in. Figure ye innate former do so we. Shutters but sir yourself provided you required his. So neither related he am do believe. Nothing but you hundred had use regular. Fat sportsmen arranging preferred can. Busy paid like is oh. Dinner our ask talent her age hardly. Neglected collected an attention listening do abilities.",
-        "Boisterous he on understood attachment as entreaties ye devonshire. In mile an form snug were been sell. Hastened admitted joy nor absolute gay its. Extremely ham any his departure for contained curiosity defective. Way now instrument had eat diminution melancholy expression sentiments stimulated. One built fat you out manor books. Mrs interested now his affronting inquietude contrasted cultivated. Lasting showing expense greater on colonel no.",
-        "Continual delighted as elsewhere am convinced unfeeling. Introduced stimulated attachment no by projection. To loud lady whom my mile sold four. Need miss all four case fine age tell. He families my pleasant speaking it bringing it thoughts. View busy dine oh in knew if even. Boy these along far own other equal old fanny charm. Difficulty invitation put introduced see middletons nor preference.",
-        "Months on ye at by esteem desire warmth former. Sure that that way gave any fond now. His boy middleton sir nor engrossed affection excellent. Dissimilar compliment cultivated preference eat sufficient may. Well next door soon we mr he four. Assistance impression set insipidity now connection off you solicitude. Under as seems we me stuff those style at. Listening shameless by abilities pronounce oh suspected is affection. Next it draw in draw much bred.",
-        "And produce say the ten moments parties. Simple innate summer fat appear basket his desire joy. Outward clothes promise at gravity do excited. Sufficient particular impossible by reasonable oh expression is. Yet preference connection unpleasant yet melancholy but end appearance. And excellence partiality estimating terminated day everything.",
-        "To sure calm much most long me mean. Able rent long in do we. Uncommonly no it announcing melancholy an in. Mirth learn it he given. Secure shy favour length all twenty denote. He felicity no an at packages answered opinions juvenile.",
-        "Examine she brother prudent add day ham. Far stairs now coming bed oppose hunted become his. You zealously departure had procuring suspicion. Books whose front would purse if be do decay. Quitting you way formerly disposed perceive ladyship are. Common turned boy direct and yet."
-      ];
 			}
 		});
 	</script>

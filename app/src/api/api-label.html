@@ -2,7 +2,7 @@
 <link rel="import" href="../../bower_components/iron-ajax/iron-ajax.html">
 <link rel="import" href="./api-behavior.html">
 
-<dom-module id="api-default-prj">
+<dom-module id="api-label">
   <template>
   
     <iron-ajax id="xhr"
@@ -22,7 +22,7 @@
       'use strict';
 
       Polymer({
-        is: 'api-default-prj',
+        is: 'api-label',
         behaviors: [
           HiveOSS.ApiBehavior
         ],
@@ -30,7 +30,7 @@
           uid: String,
           url: {
             type: String,
-            value: 'api/defaultprj'
+            value: 'api/label'
           },
           valid: {
             type: Boolean,
@@ -39,9 +39,9 @@
           },
           _body: {
             type: Object,
-            computed: '_computeBody(defaultPrj,uid)'
+            computed: '_computeBody(labeldata,uid,prj)'
           },
-          defaultPrj: {
+          prj: {
             type: Array
           }
         },
@@ -50,14 +50,20 @@
           return body && true;
         },
 
-        _computeBody: function(prj, uid) {
-          if (!prj || !uid)
+        _computeBody: function(data, prj, uid) {
+          if (!data || !prj || !uid)
             return;
 
           return {
             uid: uid,
-            prj: prj
-          }
+            prj: prj,
+            data: data
+          };
+        },
+
+        submitData: function(data) {
+          this.labeldata = data;
+          this.generateRequest();
         }
       });
     })();

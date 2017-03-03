@@ -2,18 +2,27 @@ var mongoose     = require('mongoose');
 var Schema       = mongoose.Schema;
 
 var dataSchema   = new Schema({
-    prj: String,
-    docID: Number,
-    labels: [String],
     uid: String,
-    index_start: {
-    	type: Number,
-    	default: null
-    },
-    index_end: {
-    	type: Number,
-    	default: null
-    },
+    prj: String,
+    data: {
+        type: [{
+            docID: Number,
+            labels: {
+                type: [String],
+                default: []
+            },
+            index_start: {
+                type: Number,
+                default: null
+            },
+            index_end: {
+                type: Number,
+                default: null
+            }
+        }]
+    }
 });
+
+dataSchema.index({ prj: 1, uid: 1 }, { unique: true });
 
 module.exports = mongoose.model('Data', dataSchema);

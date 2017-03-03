@@ -1,4 +1,5 @@
 <link rel="import" href="bower_components/neon-animation/neon-shared-element-animatable-behavior.html">
+<link rel="import" href="../bower_components/neon-animation/neon-animation-runner-behavior.html">
 <link rel="import" href="bower_components/neon-animation/neon-animated-pages.html">
 <link rel="import" href="bower_components/paper-icon-button/paper-icon-button.html">
 <link rel="import" href="bower_components/paper-menu-button/paper-menu-button.html">
@@ -10,9 +11,11 @@
 <link rel="import" href="bower_components/app-layout/app-layout.html">
 <link rel="import" href="src/theme/shared-styles.html">
 <link rel="import" href="src/api/api-signin.html">
+<link rel="import" href="src/api/api-config.html">
 <link rel="import" href="src/instructions-page.html">
 <link rel="import" href="src/admin-config.html">
 <link rel="import" href="src/label-page.html">
+<link rel="import" href="bower_components/iron-pages/iron-pages.html">
 
 <dom-module id="app-page">
   <template>
@@ -38,6 +41,11 @@
         color: white;
         padding-top: 8px;
       }
+      paper-menu#settingsMenu {
+        position: fixed;
+        top: 64px;
+        right: 0px;
+      }
       #settingsMenu paper-item {
         cursor: pointer;
       }
@@ -54,8 +62,6 @@
       }
       .page-wrapper {
         padding: 3em;
-        max-width: 1000px;
-        margin: auto;
       }
       paper-progress {
         display: block;
@@ -66,7 +72,23 @@
         --paper-progress-transition-timing-function: ease;
         --paper-progress-transition-transition-delay: 0s;
       }
+      neon-animated-pages {
+        min-height: calc(100vh - 64px);
+      }
       /*div.main-content { padding-top: 64px }*/
+      paper-icon-button.settings {
+        transition: transform 0.5s;
+      }
+      paper-icon-button.settings:hover {
+        transform: rotate(90deg);
+      }
+      div.right-arrow {
+        transition: all 0.5s;
+        font-size: 11px;
+      }
+      paper-icon-button.settings:hover + div.right-arrow::after {
+        content:'\25C0';
+      }
     </style>
 
     <api-signin 
@@ -81,26 +103,43 @@
       <app-toolbar>
         <paper-icon-button icon="menu" onclick="drawer.toggle()"></paper-icon-button>
         <div main-title>LabelSense</div>
-        <paper-menu-button vertical-align="top" horizontal-align="right" id="analysisDropdown">
+        <paper-icon-button icon="settings" class="settings dropdown-trigger" on-tap="showMenu">
+        </paper-icon-button>
+        <div class="right-arrow"></div>
+<!--         <paper-menu-button vertical-align="top" horizontal-align="right" id="analysisDropdown">
           <paper-icon-button icon="settings" class="dropdown-trigger"></paper-icon-button>
           <paper-menu id="settingsMenu" class="dropdown-content">
             <paper-item class="settingsHeader">Hello [[user.displayName]]!</paper-item>
             <paper-item hidden$="[[!adminUser]]" on-tap="routeToSettings">App Settings</paper-item>
             <paper-item hidden$="[[!user]]" on-tap="logout">Logout</paper-item>
           </paper-menu>
-        </paper-menu-button>
+        </paper-menu-button> -->
         <paper-progress value="[[progress]]" bottom-item></paper-progress>
       </app-toolbar>
     </app-header>
 
+    <api-config id="config" config="{{config}}"></api-config>
+
     <div class="main-content">
-      <neon-animated-pages id="page" selected="[[selectedPage]]" entry-animation="slide-from-right-animation" exit-animation="slide-left-animation">
+      <neon-animated-pages id="page" selected="[[selectedPage]]" entry-animation="slide-from-right-animation" exit-animation="fade-out-animation">
         <admin-config class="page-wrapper" uid="[[uid]]" 
         default-project="[[defaultProject]]"></admin-config>
-        <instructions-page id="instructions" class="page-wrapper"></instructions-page>
-        <label-page class="page-wrapper" tokens="[[tokens]]" tokens-per-page="3" labels='["hello","bye","hello again","bye again"]'></label-page>
+        <instructions-page id="instructions" class="page-wrapper" instructions="[[config.settings.instructions]]"></instructions-page>
+        <label-page class="page-wrapper" uid="[[uid]]" prj="[[config.prj]]" tokens="[[config.tokens]]" tokens-per-page="5" labels="[[config.labels]]"></label-page>
       </neon-animated-pages>
+<!--       <iron-pages id="page" selected="[[selectedPage]]">
+        <admin-config class="page-wrapper" uid="[[uid]]" 
+        default-project="[[defaultProject]]"></admin-config>
+        <instructions-page id="instructions" class="page-wrapper" instructions="[[config.settings.instructions]]"></instructions-page>
+        <label-page class="page-wrapper" uid="[[uid]]" prj="[[config.prj]]" tokens="[[config.tokens]]" tokens-per-page="5" labels="[[config.labels]]"></label-page>
+      </iron-pages> -->
     </div>
+
+    <paper-menu hidden id="settingsMenu" class="shadow-2dp dropdown-content">
+      <paper-item class="settingsHeader">Hello [[user.displayName]]!</paper-item>
+      <paper-item hidden$="[[!adminUser]]" on-tap="routeToSettings">App Settings</paper-item>
+      <paper-item hidden$="[[!user]]" on-tap="logout">Logout</paper-item>
+    </paper-menu>
     
   </template>
   <script>
@@ -108,6 +147,7 @@
       is: 'app-page',
       behaviors: [
         Polymer.NeonSharedElementAnimatableBehavior,
+        Polymer.NeonAnimationRunnerBehavior,
         HiveOSS.RouteBehavior
       ],
       properties: {
@@ -135,15 +175,15 @@
         animationConfig: {
           value: function() {
             return {
-              'entry': [{
+              'entry': {
                 name: 'hero-animation',
                 id: 'hero',
                 toPage: this
               },
-              {
+              'entryMenu': {
                 name: 'fade-in-animation',
                 node: this.$.settingsMenu
-              }]
+              }
             };
           }
         },
@@ -162,13 +202,18 @@
         'progress-bar': '_progressBar'
       },
 
+      showMenu: function() {
+        this.$.settingsMenu.hidden = false;
+        this.playAnimation('entryMenu');
+      },
+
       getAdminDetails: function() {
         this.$.login.getUser();
       },
 
       _isAdmin: function(admin) {
-        console.log(admin);
         if (!admin) {
+          this.$.config.generateRequest();
           this.selectedPage = 1;
           return;
         }

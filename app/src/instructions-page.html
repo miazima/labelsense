@@ -16,20 +16,17 @@
 			}
 		</style>
 
-		<div class="main-wrapper layout vertical center">
-
-			<div class="content-wrapper">
-				<paper-card heading="Instructions">
-				  <div class="card-content layout vertical">
-					  <div>
-					  	Lets write some instructions. You will be provided 100 sentences to label. Read through each sentence carefully and click on the labels that you feel fit the sentence.
-					  </div>
-					  <div class="button self-center">
-					  	<paper-button class="teal-accent-btn" on-tap="routeToLabel" raised>start</paper-button>
-					  </div>
+		<div class="layout vertical">
+			<paper-card class="content-wrapper self-center" heading="[[title]]">
+			  <div class="card-content layout vertical">
+				  <div>
+				  	[[instructions]]
 				  </div>
-				</paper-card>
-			</div>
+				  <div class="button self-center">
+				  	<paper-button class="teal-accent-btn" on-tap="routeToLabel" raised>start</paper-button>
+				  </div>
+			  </div>
+			</paper-card>
 		</div>
 		
 	</template>
@@ -41,7 +38,12 @@
 				spec: {
 					type: Object,
 					observer: '_customPage'
-				}
+				},
+				title: {
+					type: String,
+					value: 'Instructions'
+				},
+				instructions: String
 			},
 
 			routeToLabel: function () {
@@ -49,7 +51,8 @@
 			},
 
 			_customPage: function(spec) {
-				console.log(spec);
+				this.title = spec.title;
+				this.instructions = spec.content;
 			}
 		});
 	</script>
