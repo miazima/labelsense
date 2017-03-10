@@ -6,6 +6,7 @@
 <link rel="import" href="../bower_components/paper-card/paper-card.html">
 <link rel="import" href="../bower_components/paper-fab/paper-fab.html">
 <link rel="import" href="../bower_components/iron-pages/iron-pages.html">
+<link rel="import" href="../bower_components/app-storage/app-localstorage/app-localstorage-document.html">
 <link rel="import" href="api/api-label.html">
 <link rel="import" href="theme/shared-styles.html">
 
@@ -58,6 +59,8 @@
 
 		<api-label id="label" uid=[[uid]] prj=[[prj]] labelData="[[labelData]]"></api-label>
 
+		<app-localstorage-document key="prj" data="[[prj]]"></app-localstorage-document>
+
 		<div class="main-content-wrapper layout vertical">
 
 			<div class="content-wrapper paper-font-title self-center">[[prj]]</div>
@@ -72,12 +75,12 @@
 					<iron-pages selected="{{selectedPage}}">
 						<template id="firstRepeat" is="dom-repeat" items={{splitTokens}}>
 							<div class$="content_[[index]]">
-								<template class$="secondRepeat_[[index]]" is="dom-repeat" items={{item}}>
+								<template class$="secondRepeat_[[index]]" is="dom-repeat" items={{item}} index-as="list">
 									<div class="token layout horizontal">
 										<paper-card class="flex-6">
 										  <div class="card-content">[[item]]</div>
 										</paper-card>
-									 	<paper-listbox multi=[[multiSelect]] class$="labelbox flex-1 list_[[index]]" attr-for-selected="value">
+									 	<paper-listbox multi=[[multiSelect]] class$="labelbox flex-1 list_[[_computeListIndex(index,list)]]" attr-for-selected="value">
 									 		<template is="dom-repeat" items={{labels}}>
 									 			<!-- <paper-item>[[item]]</paper-item> -->
 										 		<paper-item value$="[[item]]" raised class="paper-font-button layout horizontal center-justified">
@@ -101,7 +104,7 @@
 			</div>
 
 			<div class="layout vertical" hidden$="[[_displaySave(splitTokens,selectedPage)]]">
-				<div class="self-center"><paper-button class="teal-accent-btn" on-tap="_submitLabels" raised>submit</paper-button></div>
+				<div class="self-center"><paper-button class="teal-accent-btn" disabled="[[preview]]" on-tap="_submitLabels" raised>submit</paper-button></div>
 			</div>
 		</div>
 
@@ -133,8 +136,9 @@
 				splitTokens: Array,
 				multiSelect: {
 					type: Boolean,
-					value: true
+					value: false
 				},
+				preview: Boolean,
 				animationConfig: {
 					type: Object,
 					value: function() {
@@ -179,6 +183,10 @@
 				});
 			},
 
+			_computeListIndex: function(page, list) {
+				return page * this.tokensPerPage + list;
+			},
+
 			_displaySave: function(tokens, page) {
 				if (page !== tokens.length - 1) return true;
 				return false;
@@ -196,22 +204,25 @@
 
 			_submitLabels: function() {
 				for (var i = 0; i < this.tokens.length; i++) {
+					var labels = this.multiSelect ? this.$$('.list_' + i).selectedValues : this.$$('.list_' + i).selected;
 					this.labelData[i] = {
 						docID: i,
-						labels: this.$$('.list_' + i).selectedValues
+						labels: labels
 					};
 				}
+
 				if (!this._checkLabelData()) return;
 				this.$.label.submitData(this.labelData);
 				this.fire('route-page', 'thankyou', {bubbles: true});
 			},
 
 			computeSplitTokens: function(tokens, chunk) {
+				chunk = parseInt(chunk);
 				this.splitTokens = [];
 				var temparray = [];
 
 				for (var i = 0; i < tokens.length; i += chunk) {
-				    temparray.push(tokens.slice(i, i + chunk));
+			    temparray.push(tokens.slice(i, i + chunk));
 				}
 				this.splitTokens = temparray;
 			},

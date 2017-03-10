@@ -22,6 +22,15 @@
         last-error="{{_ajaxError}}"
         last-response="{{_results2}}"></iron-ajax>
 
+    <iron-ajax id="xhr3"
+        url="[[url]]"
+        method="DELETE"
+        handle-as="json"
+        params="[[_params3]]"
+        loading="{{loading}}"
+        last-error="{{_ajaxError}}"
+        last-response="{{_results3}}"></iron-ajax>
+
   </template>
 
   <script>
@@ -45,6 +54,7 @@
            * Project name for the file.
            */
           projectName: String,
+          deletePrj: String,
           _results2: Object,
           url: {
             type: String,
@@ -54,6 +64,10 @@
             type: Boolean,
             notify: true,
             computed: '_isValid(_body)'
+          },
+          _params3: {
+            type: Object,
+            computed: '_computeParams3(uid,deletePrj)'
           },
           _params: {
             type: Object,
@@ -86,6 +100,13 @@
           return body && true;
         },
 
+        _computeParams3: function(uid, prj) {
+          var ret = Object.create(null);
+          ret.uid = uid;
+          ret.prj = prj;
+          return ret;
+        },
+
         _computeParams: function(uid) {
           var ret = Object.create(null);
           ret.uid = uid;
@@ -115,6 +136,10 @@
           if (!params || !getRequest) return;
           this.$.xhr2.generateRequest();
           this.getRequest = false;
+        },
+
+        deleteProject: function() {
+          this.$.xhr3.generateRequest();
         }
       });
     })();

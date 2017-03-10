@@ -1,4 +1,5 @@
 <link rel="import" href="../bower_components/paper-dropdown-menu/paper-dropdown-menu.html">
+<link rel="import" href="../bower_components/paper-checkbox/paper-checkbox.html">
 <link rel="import" href="../bower_components/paper-listbox/paper-listbox.html">
 <link rel="import" href="../bower_components/paper-input/paper-textarea.html">
 <link rel="import" href="../bower_components/paper-button/paper-button.html">
@@ -9,8 +10,7 @@
 <link rel="import" href="../bower_components/iron-a11y-keys/iron-a11y-keys.html">
 <link rel="import" href="../bower_components/neon-animation/neon-shared-element-animatable-behavior.html">
 <link rel="import" href="../bower_components/neon-animation/neon-animation-runner-behavior.html">
-<link rel="import" href="../bower_components/neon-animation/animations/fade-out-animation.html">
-<link rel="import" href="../bower_components/neon-animation/animations/fade-in-animation.html">
+<link rel="import" href="../bower_components/neon-animation/neon-animations.html">
 <link rel="import" href="theme/shared-styles.html">
 
 <dom-module id="project-settings">
@@ -31,7 +31,7 @@
 				padding: 20px;
 			}
 			paper-textarea.textarea {
-				width: 40%;
+				max-width: 800px;
 			}
 			paper-item {
 				cursor: pointer;
@@ -65,8 +65,8 @@
       	background: white;
       	position: relative;
         margin: 0px 50px 0;
-        height: 900px;
       }
+      .content-wrapper { padding: 15px; }
 		</style>
 		<div id="fixed" class="fixed" on-tap="closeSettings"></div>
 		<paper-card id="card" class="card main-content-wrapper layout vertical">
@@ -85,11 +85,11 @@
 			<div class="paper-font-title">Page Display</div>
 			<div class="settings layout horizontal wrap">
 				<paper-dropdown-menu label="Number of sentences per page:">
-				  <paper-listbox class="dropdown-content" selected="{{settings.display}}">
-				    <paper-item>5 sentences</paper-item>
-				    <paper-item>10 sentences</paper-item>
-				    <paper-item>15 sentences</paper-item>
-				    <paper-item>20 sentences</paper-item>
+				  <paper-listbox class="dropdown-content" selected="{{settings.display}}" attr-for-selected="name">
+				    <paper-item name="5">5 sentences</paper-item>
+				    <paper-item name="10">10 sentences</paper-item>
+				    <paper-item name="15">15 sentences</paper-item>
+				    <paper-item name="20">20 sentences</paper-item>
 				  </paper-listbox>
 				</paper-dropdown-menu>
 			</div>
@@ -101,6 +101,9 @@
 
 			<div class="paper-font-title">Labels</div>
 			<div class="settings layout vertical">
+				<div class="content-wrapper">
+					<paper-checkbox checked="{{settings.multiLabel}}">Enable multiple labels for each token</paper-checkbox>
+				</div>
 				<div class="content-wrapper layout horizontal">
 					<paper-input-container id="txt-add" class="ta-default-textfield" no-label-float placeholder="Add new label">
 	          <iron-a11y-keys id="a11y" target="[[targetStopwordInput]]" keys="enter" on-keys-pressed="addLabel"></iron-a11y-keys>
@@ -143,10 +146,7 @@
 					type: Object,
 					observer: '_getSettings'
 				},
-				labels: {
-					type: Array,
-					observer: '_getLabels'
-				},
+				labels: Array,
 				sharedElements: {
 	        type: Object,
 	        value: function() {
@@ -162,12 +162,13 @@
 							'exitLabel': {
 								name: 'fade-out-animation'
 							},
-							'entryLabels': {
+							'slideLabels': {
+								name: 'cascaded-animation',
+								animation: 'slide-from-right-animation',
+								timing: {duration: 800}
+							},
+							'entryLabel': {
 								name: 'fade-in-animation',
-								node: this.$.labels,
-								timing: {
-									duration: 5000
-								}
 							},
 							'entry': [{
 	              name: 'ripple-animation',
@@ -203,29 +204,41 @@
 		  	if (!sets) this.settings = {};
 		  },
 
-		  _getLabels: function(labels) {
-		  	console.log(labels);
-		  },
-
 			addLabel: function() {
 				if (!this.inputLabel) return;
-				console.log('add labels');
 				this.push('labels', this.inputLabel.trim());
 				this.inputLabel = '';
+
+				this.async(function() {
+					var labels = this.$.labels.querySelectorAll('paper-button');
+					var added = labels[labels.length - 1];
+					this.animationConfig.entryLabel.node = added;
+	        this.playAnimation('entryLabel');
+				});
 			},
 
 			removeLabel: function(e) {
 				this.deletedLabel = e.model.item;
 				this.animationConfig.exitLabel.node = e.target.parentElement;
+				
         this.playAnimation('exitLabel', 'removeLabel');
 			},
 
 			_onNeonAnimationFinish: function(e, animation) {
 				switch(animation) {
 			    case 'removeLabel':
-		        // this.playAnimation('entryLabels');
 			      var index = this.labels.indexOf(this.deletedLabel);
 		        this.splice('labels', index, 1);
+
+		        this.async(function() {
+		        	var labels = this.$.labels.querySelectorAll('paper-button');
+							var slide = [];
+							for (var i = index; i < labels.length; i++) {
+								slide.push(labels[i]);
+							}
+			        this.animationConfig.slideLabels.nodes = slide;
+			        this.playAnimation('slideLabels');
+		        });
 			      break;
 			  }
 			},

@@ -20,10 +20,12 @@
 			<paper-card class="content-wrapper self-center" heading="[[title]]">
 			  <div class="card-content layout vertical">
 				  <div>
-				  	[[instructions]]
+				  	<template is="dom-repeat" items=[[paragraphs]]>
+				  		<p>[[item]]</p>
+				  	</template>
 				  </div>
 				  <div class="button self-center">
-				  	<paper-button class="teal-accent-btn" on-tap="routeToLabel" raised>start</paper-button>
+				  	<paper-button class="teal-accent-btn" on-tap="routeToPage" raised>[[buttonContent]]</paper-button>
 				  </div>
 			  </div>
 			</paper-card>
@@ -43,16 +45,34 @@
 					type: String,
 					value: 'Instructions'
 				},
-				instructions: String
+				instructions: String,
+				buttonContent: {
+					type: String,
+					value: 'Start'
+				},
+				paragraphs: {
+					type: Array,
+					computed: '_parseInstructions(instructions)'
+				}
 			},
 
-			routeToLabel: function () {
+			routeToPage: function () {
+				if (this.spec) {
+					this.fire('log-out');
+					return;
+				}
 				this.fire('route-page', 'label');
 			},
 
 			_customPage: function(spec) {
 				this.title = spec.title;
+				this.buttonContent = spec.buttonContent;
 				this.instructions = spec.content;
+			},
+
+			_parseInstructions: function(ins) {
+				if (!ins) return;
+				return ins.split('\n');
 			}
 		});
 	</script>

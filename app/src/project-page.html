@@ -20,12 +20,12 @@
 			neon-animated-pages { min-height: 600px; }
 		</style>
 
-		<api-project id="project" uid="[[uid]]" project-list="{{projectList}}"></api-project>
+		<api-project id="project" uid="[[uid]]" delete-prj="[[deletePrj]]" project-list="{{projectList}}"></api-project>
 		<api-settings id="settings" uid="[[uid]]" save="[[save]]" project="[[project]]" settings="{{settings}}" labels="{{labels}}"></api-settings>
 		<api-default-prj id="default" uid="[[uid]]" default-prj="{{defaultProject}}"></api-default-prj>
 
 		<neon-animated-pages id="pages" selected="0">
-	    <project-list project-list="{{projectList}}" default-project="[[defaultProject]]" project="{{project}}" on-open-settings="toggleSettings" on-set-default-prj="_setDefaultPrj"></project-list>
+	    <project-list uid="[[uid]]" project-list="{{projectList}}" default-project="[[defaultProject]]" project="{{project}}" on-open-settings="toggleSettings" on-set-default-prj="_setDefaultPrj" on-delete-project="_deletePrj"></project-list>
       <project-settings project="[[project]]" settings="[[settings]]" labels="[[labels]]" on-close-settings="toggleSettings" on-save-settings="saveSettings"></project-settings>
     </neon-animated-pages>
 
@@ -42,8 +42,11 @@
 				uid: String,
 				save: Object,
 				settings: Object,
-				defaultProject: String,
-				projectList: Array
+				defaultProject: {
+					type: String
+				},
+				projectList: Array,
+				deletePrj: String
 			},
 
 			_visibleChanged: function(vis) {
@@ -55,6 +58,14 @@
 			_setDefaultPrj: function(e, prj) {
 				this.defaultProject = prj;
 				this.$.default.generateRequest();
+			},
+
+			_deletePrj: function(e, prj) {
+				this.deletePrj = prj;
+				this.$.project.deleteProject();
+				this.async(function() {
+					this.$.project.getProjects();
+				});
 			},
 
 			toggleSettings: function(e) {
@@ -69,6 +80,9 @@
 			saveSettings: function(e, info) {
 				this.save = info;
 				this.$.settings.generateRequest();
+				if (this.project === this.defaultProject) {
+					this.$.default.generateRequest();
+				}
 			}
 		});
 	</script>

@@ -6,6 +6,7 @@
 <link rel="import" href="bower_components/iron-flex-layout/iron-flex-layout.html">
 <link rel="import" href="bower_components/paper-progress/paper-progress.html">
 <link rel="import" href="bower_components/paper-menu/paper-menu.html">
+<link rel="import" href="bower_components/paper-toast/paper-toast.html">
 <link rel="import" href="bower_components/paper-item/paper-item.html">
 <link rel="import" href="bower_components/iron-icons/iron-icons.html">
 <link rel="import" href="bower_components/app-layout/app-layout.html">
@@ -46,7 +47,7 @@
         top: 64px;
         right: 0px;
       }
-      #settingsMenu paper-item {
+      #settingsMenu paper-item:not(:first-child) {
         cursor: pointer;
       }
       #analysisDropdown iron-dropdown.paper-menu-button {
@@ -75,7 +76,6 @@
       neon-animated-pages {
         min-height: calc(100vh - 64px);
       }
-      /*div.main-content { padding-top: 64px }*/
       paper-icon-button.settings {
         transition: transform 0.5s;
       }
@@ -86,8 +86,11 @@
         transition: all 0.5s;
         font-size: 11px;
       }
-      paper-icon-button.settings:hover + div.right-arrow::after {
-        content:'\25C0';
+      paper-icon-button.settings:hover + div.right-arrow::after { content:'\25B6'; }
+      #toastpreview { padding: 10px 25px; }
+      .yellow-button {
+        text-transform: none;
+        color: #eeff41;
       }
     </style>
 
@@ -101,22 +104,17 @@
 
     <app-header id="header" reveals>
       <app-toolbar>
-        <paper-icon-button icon="menu" onclick="drawer.toggle()"></paper-icon-button>
         <div main-title>LabelSense</div>
-        <paper-icon-button icon="settings" class="settings dropdown-trigger" on-tap="showMenu">
+        <paper-icon-button icon="settings" class="settings dropdown-trigger" on-tap="openMenu">
         </paper-icon-button>
         <div class="right-arrow"></div>
-<!--         <paper-menu-button vertical-align="top" horizontal-align="right" id="analysisDropdown">
-          <paper-icon-button icon="settings" class="dropdown-trigger"></paper-icon-button>
-          <paper-menu id="settingsMenu" class="dropdown-content">
-            <paper-item class="settingsHeader">Hello [[user.displayName]]!</paper-item>
-            <paper-item hidden$="[[!adminUser]]" on-tap="routeToSettings">App Settings</paper-item>
-            <paper-item hidden$="[[!user]]" on-tap="logout">Logout</paper-item>
-          </paper-menu>
-        </paper-menu-button> -->
         <paper-progress value="[[progress]]" bottom-item></paper-progress>
       </app-toolbar>
     </app-header>
+
+    <paper-toast id="toastpreview" class="fit-bottom" duration="0" text="This is a preview!">
+      <paper-button on-tap="exitPreview" class="yellow-button">Close now!</paper-button>
+    </paper-toast>
 
     <api-config id="config" config="{{config}}"></api-config>
 
@@ -124,8 +122,8 @@
       <neon-animated-pages id="page" selected="[[selectedPage]]" entry-animation="slide-from-right-animation" exit-animation="fade-out-animation">
         <admin-config class="page-wrapper" uid="[[uid]]" 
         default-project="[[defaultProject]]"></admin-config>
-        <instructions-page id="instructions" class="page-wrapper" instructions="[[config.settings.instructions]]"></instructions-page>
-        <label-page class="page-wrapper" uid="[[uid]]" prj="[[config.prj]]" tokens="[[config.tokens]]" tokens-per-page="5" labels="[[config.labels]]"></label-page>
+        <instructions-page id="instructions" class="page-wrapper" instructions="[[config.settings.instructions]]" on-log-out="logout"></instructions-page>
+        <label-page class="page-wrapper" preview="[[preview]]" uid="[[uid]]" prj="[[config.prj]]" tokens="[[config.tokens]]" tokens-per-page="[[config.settings.display]]" labels="[[config.labels]]" multi-select="[[config.settings.multiLabel]]"></label-page>
       </neon-animated-pages>
 <!--       <iron-pages id="page" selected="[[selectedPage]]">
         <admin-config class="page-wrapper" uid="[[uid]]" 
@@ -135,7 +133,7 @@
       </iron-pages> -->
     </div>
 
-    <paper-menu hidden id="settingsMenu" class="shadow-2dp dropdown-content">
+    <paper-menu hidden$="[[showMenu]]" id="settingsMenu" class="shadow-2dp dropdown-content">
       <paper-item class="settingsHeader">Hello [[user.displayName]]!</paper-item>
       <paper-item hidden$="[[!adminUser]]" on-tap="routeToSettings">App Settings</paper-item>
       <paper-item hidden$="[[!user]]" on-tap="logout">Logout</paper-item>
@@ -151,6 +149,12 @@
         HiveOSS.RouteBehavior
       ],
       properties: {
+        eventHandler: Object,
+        preview: Boolean,
+        showMenu: {
+          type: Boolean,
+          value: true
+        },
         selectedPage: Number,
         progress: {
           type: Number,
@@ -158,7 +162,8 @@
         },
         adminUser: {
           type: Boolean,
-          observer: '_isAdmin'
+          observer: '_isAdmin',
+          value: false
         },
         uid: {
           type: String,
@@ -181,7 +186,11 @@
                 toPage: this
               },
               'entryMenu': {
-                name: 'fade-in-animation',
+                name: 'slide-from-right-animation',
+                node: this.$.settingsMenu
+              },
+              'exitMenu': {
+                name: 'slide-right-animation',
                 node: this.$.settingsMenu
               }
             };
@@ -191,7 +200,8 @@
           type: Object,
           value: function() {
             return {
-              title: 'Thank you!'
+              title: 'Thank you!',
+              buttonContent: 'finish'
             };
           }
         }
@@ -199,12 +209,47 @@
 
       listeners: {
         'route-page': 'routePage',
-        'progress-bar': '_progressBar'
+        'progress-bar': '_progressBar',
+        'neon-animation-finish': '_onNeonAnimationFinish'
       },
 
-      showMenu: function() {
-        this.$.settingsMenu.hidden = false;
-        this.playAnimation('entryMenu');
+      _onNeonAnimationFinish: function(e, animation) {
+        switch (animation) {
+          case 'entryMenu': 
+            window.addEventListener('click', this.eventHandler);
+            break;
+          case 'exitMenu':
+            this.showMenu = true;
+            window.removeEventListener('click', this.eventHandler);
+            break;
+        }
+      },
+
+      attached: function() {
+        var listener = function(e) {
+          var that = this.$.settingsMenu;
+          var target = e.target;
+
+          while (target != that && target != document.body) {
+            target = Polymer.dom(target).node.parentElement;
+          }
+
+          if (target !== that) {
+            if (!that.hidden) this.playAnimation('exitMenu', 'exitMenu');
+          }
+        };
+        this.eventHandler =  listener.bind(this);
+      },
+
+      openMenu: function() {
+        this.showMenu = false;
+        this.playAnimation('entryMenu', 'entryMenu');
+      },
+
+      exitPreview: function() {
+        this.preview = false;
+        this.$.toastpreview.close();
+        this.selectedPage = 0;
       },
 
       getAdminDetails: function() {
@@ -235,6 +280,12 @@
             break;
           case 'thankyou':
             this.$.instructions.spec = this.spec;
+            this.selectedPage = 1;
+            break;
+          case 'intro': 
+            this.preview = true;
+            this.$.config.generateRequest();
+            this.$.toastpreview.open();
             this.selectedPage = 1;
             break;
         }

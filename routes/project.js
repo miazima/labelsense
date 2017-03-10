@@ -78,6 +78,16 @@ router.route('/project')
               projects: projects
             });
         });
+    })
+
+    .delete(function(req, res) {
+    	ProjectSchema.find({ prj: req.query.prj, uid: req.query.uid })
+    		.remove(function(err, prj) {
+    			res.json({
+    				err: err,
+    				meesage: 'Successfully deleted!'
+    			});
+    		});
     });
 
 
@@ -115,7 +125,9 @@ router.route('/defaultprj')
 	.post(function(req, res) {
 		// Save the project as default
 		var defaultprj = req.body.prj;
-		UserSchema.findOneAndUpdate({ uid: req.body.uid }, { $set: { prj: defaultprj } });
+		UserSchema.findOneAndUpdate({ uid: req.body.uid }, { $set: { prj: defaultprj } }, function(err, res) {
+			
+		});
 		// Retrieve the project settings
 		ProjectSchema
 			.findOne({ prj: defaultprj })

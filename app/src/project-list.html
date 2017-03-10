@@ -48,15 +48,21 @@
 			}
 			div.preview { padding-left: 20px; }
 			paper-icon-button.actions {
+				transition: all 0.5s;
 				color: var(--paper-grey-500);
 			}
-			paper-icon-button.export:hover {
-				color: var(--paper-teal-a700);
+			paper-button.export {
+				transition: all 0.5s;
+				color:  var(--paper-teal-a700);
+				background: var(--paper-teal-50);
+			}
+			paper-button.export:hover {
+				color:  white;
+				background: var(--paper-teal-a700);
 			}
 			paper-icon-button.delete:hover {
 				color: var(--paper-red-500);
 			}
-			span#export { color: var(--paper-teal-500) }
 		</style>
 
 		<div class="settings">
@@ -75,7 +81,7 @@
 				</paper-dropdown-menu>
 
 				<div class="preview self-center">
-					<paper-button class="teal-accent-btn" raised on-tap="routeToLabel">View Preview</paper-button>
+					<paper-button class="teal-accent-btn" raised on-tap="routeToIntro">View Preview</paper-button>
 				</div>
 			</div>
 		</div>
@@ -93,12 +99,11 @@
 					<div class="flex self-center">[[item.prj]]</div>
 					<div class="flex self-center">{{parseDateTime(item.created)}}</div>
 					<div class="flex self-center">[[parseLabels(item.labels)]]</div>
-					<div class="flex self-center layout horizontal">
-						<paper-icon-button class="actions delete" icon="delete"></paper-icon-button>
-						<div class="layout horizontal self-stretch" on-mouseover="_showExport" on-mouseout="_hideExport">
-							<paper-icon-button class="actions export" icon="file-download"></paper-icon-button>
-							<div hidden class$="export_[[index]] self-center"><span id="export" class="paper-font-button">Export</span></div>
+					<div class="flex self-center layout horizontal justified">
+						<div class="layout horizontal self-stretch">
+							<paper-button class="export paper-font-button" on-tap="exportProject"><iron-icon class="actions" icon="file-download"></iron-icon>export</paper-button>
 						</div>
+						<paper-icon-button class="actions delete" icon="delete" on-tap="deleteProject"></paper-icon-button>
 					</div>
 				</div>
 			</template>
@@ -123,19 +128,15 @@
 					type: Array
 				},
 				defaultProject: {
-					type: String
+					type: String,
+					value: '',
+					observer: '_getDefaultProject'
 				},
 				uid: String,
 				animationConfig: {
 					type: Object,
 					value: function() {
 						return {
-							'exportEntry': {
-								name: 'fade-in-animation'
-							},
-							'exportExit': {
-								name: 'fade-out-animation'
-							},
 							'exit': [{
 	              name: 'ripple-animation',
 	              id: 'ripple',
@@ -154,47 +155,13 @@
 				'neon-animation-finish': '_onNeonAnimationFinish'
 			},
 
-			observers: [
-				'_getDefaultProject(defaultProject,projectList)'
-			],
-
 			_onNeonAnimationFinish: function(e, animation) {
 				switch (animation.name) {
-					case 'exportExit': 
-						this.$$('.export_' + animation.index).hidden = true;
-						break;
-					case 'exportEntry': 
-						this.$$('.export_' + animation.index).hidden = false;
-						break;
 				}
 			},
 
-			_showExport: function(e) {
-				console.log('enter');
-				
-				var index = e.model.index;
-				this.$$('.export_' + index).hidden = false;
-				this.animationConfig.exportEntry.node = this.$$('.export_' + index);
-				this.playAnimation('exportEntry', {
-					name:'exportEntry',
-					index: index
-				});
-			},
-
-			_hideExport: function(e) {
-				var index = e.model.index;
-				this.animationConfig.exportExit.node = this.$$('.export_' + index);
-				this.async(function() {
-					console.log('exit');
-					this.playAnimation('exportExit', {
-						name:'exportExit',
-						index: index
-					});
-				}, 300);
-			},
-
-			routeToLabel: function() {
-				this.fire('route-page', 'label', {bubbles: true});
+			routeToIntro: function() {
+				this.fire('route-page', 'intro', {bubbles: true});
 			},
 
 			_computeInfo: function(list) {
@@ -207,9 +174,11 @@
 				return 1;
 			},
 
-			_getDefaultProject: function(prj, list) {
-				if (typeof prj !== 'string') return;
-				if (list && list.length === 1) {
+			_getDefaultProject: function(prj, prev) {
+				if (!prev || prev === '') return;
+				if (!this.projectList) return;
+				var list = this.projectList;
+				if (prj === '' && list && list.length === 1) {
 					this.fire('set-default-prj', list[0].prj);
 					return;
 				}
@@ -245,6 +214,17 @@
 	      };
 	      this.project = event.model.item.prj;
 	      this.fire('open-settings');
+			},
+
+			exportProject: function(e) {
+				e.stopPropagation();
+				window.location = 'http://' + window.location.hostname + ':' + window.location.port +
+            '/api/label?uid=' + this.uid + '&prj=' + e.model.item.prj;
+			},
+
+			deleteProject: function(e) {
+				e.stopPropagation();
+				this.fire('delete-project', e.model.item.prj);
 			}
 
 		});

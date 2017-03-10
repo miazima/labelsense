@@ -34,8 +34,8 @@
 
 		<api-project id="project" uid="[[uid]]" project-name="[[projectName]]" file="[[projectFile]]" on-success="_handleSuccess"></api-project>
 		
-		<div class="main-content-wrapper layout vertical center-justified">			
-			<div class="content-wrapper layout vertical">
+		<div class="main-content-wrapper layout vertical">			
+			<div class="content-wrapper layout vertical self-center">
 				<hiveoss-dragdrop-box id="dragdrop"
 		     form-data="{{formData}}"
 		     last-file="{{projectFile}}"
@@ -48,7 +48,7 @@
 	      </p>
 			</div>
 
-      <div class="content-wrapper horizontal center-justified layout">
+      <div class="content-wrapper horizontal center-justified layout self-center">
     		<validator-projectname project-list=[[projectList]]></validator-projectname>
 	      <paper-input-container class="paper-textfield" auto-validate invalid="[[_invalidProjectName]]">
 	        <label>Analysis Name</label>
@@ -68,7 +68,7 @@
 	      </paper-input-container>
     	</div>
 
-    	<div class="content-wrapper horizontal center-justified layout">
+    	<div class="content-wrapper horizontal center-justified layout self-center">
     		<paper-button class="uploadBtn paper-font-button" raised on-tap="executeUpload" disabled=[[invalidInput]]>Upload New Project
 				<iron-icon class="end-justified" icon="file-upload"></paper-button>
     	</div>
@@ -79,6 +79,7 @@
 		Polymer({
 			is: 'upload-component',
 			properties: {
+				uid: String,
 				formData: Object,
 				projectFile: Object,
 				projectName: String,
