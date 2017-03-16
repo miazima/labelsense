@@ -213,6 +213,7 @@
 
 				if (!this._checkLabelData()) return;
 				this.$.label.submitData(this.labelData);
+				this.fire('progress-bar', 100, {bubbles: true});
 				this.fire('route-page', 'thankyou', {bubbles: true});
 			},
 
@@ -256,7 +257,7 @@
 					this.selectedPage = this.selectedPage + 1;
 				}, 300);
 
-				var progress = this.selectedPage * 20;
+				var progress = (this.selectedPage + 1) * (100 / this.splitTokens.length);
 				this.fire('progress-bar', progress, {bubbles: true});
 			}
 		});
