@@ -1,5 +1,5 @@
 <link rel="import" href="bower_components/neon-animation/neon-shared-element-animatable-behavior.html">
-<link rel="import" href="../bower_components/neon-animation/neon-animation-runner-behavior.html">
+<link rel="import" href="bower_components/neon-animation/neon-animation-runner-behavior.html">
 <link rel="import" href="bower_components/neon-animation/neon-animated-pages.html">
 <link rel="import" href="bower_components/paper-icon-button/paper-icon-button.html">
 <link rel="import" href="bower_components/paper-menu-button/paper-menu-button.html">
@@ -131,7 +131,7 @@
       </iron-pages> -->
     </div>
 
-    <paper-menu hidden$="[[showMenu]]" id="settingsMenu" class="shadow-2dp dropdown-content">
+    <paper-menu hidden$="[[showMenu]]" id="settingsMenu" class="shadow-2dp">
       <paper-item class="settingsHeader">Hello [[user.displayName]]!</paper-item>
       <paper-item hidden$="[[!adminUser]]" on-tap="routeToSettings">App Settings</paper-item>
       <paper-item hidden$="[[!user]]" on-tap="logout">Logout</paper-item>

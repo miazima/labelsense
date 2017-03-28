@@ -165,7 +165,7 @@
         },
 
         _getDefaultProject: function(res) {
-          if (!res.users || !res.users.prj) return null;
+          if (!res || !res.users || !res.users.prj) return null;
           return res.users.prj;
         }
       });
