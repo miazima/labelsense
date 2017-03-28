@@ -16,7 +16,6 @@
 <link rel="import" href="src/instructions-page.html">
 <link rel="import" href="src/admin-config.html">
 <link rel="import" href="src/label-page.html">
-<link rel="import" href="bower_components/iron-pages/iron-pages.html">
 
 <dom-module id="app-page">
   <template>
@@ -123,12 +122,6 @@
         <instructions-page id="instructions" class="page-wrapper" instructions="[[config.settings.instructions]]" on-log-out="logout"></instructions-page>
         <label-page class="page-wrapper" preview="[[preview]]" uid="[[uid]]" prj="[[config.prj]]" tokens="[[config.tokens]]" tokens-per-page="[[config.settings.display]]" labels="[[config.labels]]" multi-select="[[config.settings.multiLabel]]"></label-page>
       </neon-animated-pages>
-<!--       <iron-pages id="page" selected="[[selectedPage]]">
-        <admin-config class="page-wrapper" uid="[[uid]]" 
-        default-project="[[defaultProject]]"></admin-config>
-        <instructions-page id="instructions" class="page-wrapper" instructions="[[config.settings.instructions]]"></instructions-page>
-        <label-page class="page-wrapper" uid="[[uid]]" prj="[[config.prj]]" tokens="[[config.tokens]]" tokens-per-page="5" labels="[[config.labels]]"></label-page>
-      </iron-pages> -->
     </div>
 
     <paper-menu hidden$="[[showMenu]]" id="settingsMenu" class="shadow-2dp">
