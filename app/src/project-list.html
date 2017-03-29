@@ -18,7 +18,8 @@
 			}
 			div.header {
 				padding: 1em;
-				background: var(--paper-teal-100);
+				background: var(--paper-blue-grey-900);
+				color: white;
 			}
 			div.row {
 				background: var(--paper-grey-50);
@@ -29,17 +30,14 @@
 			div.settings { padding: 20px; }
 			div.settings > * { padding-bottom: 20px; }
 			paper-dropdown-menu {
-				--paper-dropdown-menu: {
-					/*font-size: 16px;*/
-				};
 				 --paper-input-container-label: {
-            color: var(--paper-teal-500);
-            font-size: 20px;
-        };
+					color: var(--paper-amber-500);
+					font-size: 20px;
+				};
 			}
 			paper-item {
 				cursor: pointer;
-				--paper-item-focused: { color: var(--paper-teal-500); };
+				--paper-item-focused: { color: var(--paper-amber-700); };
 			}
 			paper-item:hover { background: var(--paper-grey-200); }
 			iron-icon.info {
@@ -53,12 +51,12 @@
 			}
 			paper-button.export {
 				transition: all 0.5s;
-				color:  var(--paper-teal-a700);
-				background: var(--paper-teal-50);
+				color:  var(--paper-amber-600);
+				background: var(--paper-amber-50);
 			}
 			paper-button.export:hover {
 				color:  white;
-				background: var(--paper-teal-a700);
+				background: var(--paper-amber-a700);
 			}
 			paper-icon-button.delete:hover {
 				color: var(--paper-red-500);
