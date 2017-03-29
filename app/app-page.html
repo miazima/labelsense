@@ -23,71 +23,55 @@
       :host {
         display: block;
       }
-      app-toolbar {
-        background-color: var(--paper-teal-500);
-      }
-      app-header {
-        /*@apply(--layout-fixed-top);*/
-        color: white;
-        --app-header-background-rear-layer: {
-          background-color: #ef6c00;
-        };
-      }
       paper-menu {
         padding-top: 0px;
       }
-      paper-item.settingsHeader {
-        background-color: var(--paper-teal-800);
-        color: white;
-        padding-top: 8px;
-      }
-      paper-menu#settingsMenu {
-        position: fixed;
-        top: 64px;
-        right: 0px;
-      }
-      #settingsMenu paper-item:not(:first-child) {
-        cursor: pointer;
-      }
       #analysisDropdown iron-dropdown.paper-menu-button {
         color: red;
-      }
-      paper-menu-button {
-       --paper-menu-button-dropdown:{
-          width:200px;
-          top:64px !important;
-          right: 0px;
-          left: initial !important;
-        };
       }
       .page-wrapper {
         padding: 3em;
       }
       paper-progress {
+        position: fixed;
+        z-index: 1;
         display: block;
         width: 100%;
-        --paper-progress-active-color: var(--paper-teal-a400);
+        --paper-progress-active-color: var(--paper-indigo-500);
         --paper-progress-container-color: rgba(255, 255, 255, 0.5);
         --paper-progress-transition-duration: 0.5s;
       }
-      neon-animated-pages {
-        min-height: calc(100vh - 64px);
+      paper-fab.settings {
+        --paper-fab-iron-icon: {
+          transition: transform 0.5s;
+        };
       }
-      paper-icon-button.settings {
-        transition: transform 0.5s;
+      div.settingsDiv {
+        position: fixed;
+        right: 30px;
+        bottom: 30px;
       }
-      paper-icon-button.settings:hover {
+      div.settingsDiv > div { padding-top: 10px; }
+      div.settingsDiv:hover::shadow iron-icon {
         transform: rotate(90deg);
       }
+      paper-fab.settings.cascade:hover {
+        background: var(--paper-amber-700);
+      }
+      div.settingsDiv:hover > paper-fab.settings:last-child { background: var(--paper-blue-grey-500); } 
       div.right-arrow {
         transition: all 0.5s;
         font-size: 11px;
       }
-      paper-icon-button.settings:hover + div.right-arrow::after { content:'\25B6'; }
+      paper-fab.settings:hover  div.right-arrow::after { content:'\25B6'; }
       #toastpreview { padding: 10px 25px; }
       .yellow-button {
         text-transform: none;
         color: #eeff41;
+      }
+      paper-fab.settings { background: var(--paper-blue-grey-800); }
+      div.menu-label {
+        padding-right: 15px;
       }
     </style>
 
@@ -98,16 +82,9 @@
       user="{{user}}"
       admin-user="{{adminUser}}">
     </api-signin>
+    
+    <paper-progress class="transiting" value="[[progress]]" bottom-item></paper-progress>
 
-    <app-header id="header" reveals>
-      <app-toolbar>
-        <div main-title>LabelSense</div>
-        <paper-icon-button icon="settings" class="settings dropdown-trigger" on-tap="openMenu">
-        </paper-icon-button>
-        <div class="right-arrow"></div>
-        <paper-progress class="transiting" value="[[progress]]" bottom-item></paper-progress>
-      </app-toolbar>
-    </app-header>
 
     <paper-toast id="toastpreview" class="fit-bottom" duration="0" text="This is a preview!">
       <paper-button on-tap="exitPreview" class="yellow-button">Close now!</paper-button>
@@ -124,12 +101,20 @@
       </neon-animated-pages>
     </div>
 
-    <paper-menu hidden$="[[showMenu]]" id="settingsMenu" class="shadow-2dp">
-      <paper-item class="settingsHeader">Hello [[user.displayName]]!</paper-item>
-      <paper-item hidden$="[[!adminUser]]" on-tap="routeToSettings">App Settings</paper-item>
-      <paper-item hidden$="[[!user]]" on-tap="logout">Logout</paper-item>
-    </paper-menu>
-    
+    <div class="settingsDiv layout vertical justified" on-mouseenter="openMenu" on-mouseleave="closeMenu">
+      <div class="layout horizontal self-end" hidden$="[[hideMenu]]">
+        <div class="menu-label self-center">Log out</div>
+        <paper-fab class="settings cascade" icon="exit-to-app" on-tap="logout"></paper-fab>
+      </div>
+      <div class="layout horizontal self-end" hidden$="[[_showAppSettings(hideMenu,adminUser)]]">
+        <div class="menu-label self-center">App Settings</div>
+        <paper-fab class="settings cascade" icon="settings" on-tap="routeToSettings"></paper-fab>    
+      </div>
+      <div class="layout horizontal self-end">
+        <div class="menu-label self-center" hidden$="[[hideMenu]]">Hello [[user.displayName]]!</div>
+        <paper-fab id="settingsBtn" class="settings" icon="menu"></paper-fab>
+      </div>
+    </div>    
   </template>
   <script>
     Polymer({
@@ -142,7 +127,7 @@
       properties: {
         eventHandler: Object,
         preview: Boolean,
-        showMenu: {
+        hideMenu: {
           type: Boolean,
           value: true
         },
@@ -176,14 +161,23 @@
                 id: 'hero',
                 toPage: this
               },
-              'entryMenu': {
-                name: 'slide-from-right-animation',
-                node: this.$.settingsMenu
-              },
-              'exitMenu': {
-                name: 'slide-right-animation',
-                node: this.$.settingsMenu
-              }
+              'entryMenu': [{
+                name: 'cascaded-animation',
+                animation: 'slide-from-bottom-animation'
+              }, {
+                name: 'cascaded-animation',
+                animation: 'fade-in-animation'
+              }],
+              'exitMenu': [{
+                name: 'cascaded-animation',
+                animation: 'slide-down-animation'
+              }, {
+                name: 'cascaded-animation',
+                animation: 'fade-out-animation'
+              }, {
+                name: 'cascaded-animation',
+                animation: 'fade-out-animation'
+              }]
             };
           }
         },
@@ -207,34 +201,30 @@
       _onNeonAnimationFinish: function(e, animation) {
         switch (animation) {
           case 'entryMenu': 
-            window.addEventListener('click', this.eventHandler);
             break;
           case 'exitMenu':
-            this.showMenu = true;
-            window.removeEventListener('click', this.eventHandler);
+            this.hideMenu = true;
             break;
         }
       },
 
-      attached: function() {
-        var listener = function(e) {
-          var that = this.$.settingsMenu;
-          var target = e.target;
-
-          while (target != that && target != document.body) {
-            target = Polymer.dom(target).node.parentElement;
-          }
-
-          if (target !== that) {
-            if (!that.hidden) this.playAnimation('exitMenu', 'exitMenu');
-          }
-        };
-        this.eventHandler =  listener.bind(this);
+      _showAppSettings: function(menu, admin) {
+        if (!menu) return true;
+        return !admin;
       },
 
       openMenu: function() {
-        this.showMenu = false;
+        this.animationConfig.entryMenu[0].nodes = document.querySelectorAll('paper-fab.settings.cascade');
+        this.animationConfig.entryMenu[1].nodes = document.querySelectorAll('div.menu-label');
+        this.animationConfig.exitMenu[0].nodes = this.animationConfig.entryMenu[0].nodes;
+        this.animationConfig.exitMenu[1].nodes = this.animationConfig.entryMenu[1].nodes;
+        this.animationConfig.exitMenu[2].nodes = this.animationConfig.entryMenu[0].nodes;
+        this.hideMenu = false;
         this.playAnimation('entryMenu', 'entryMenu');
+      },
+
+      closeMenu: function() {
+        this.playAnimation('exitMenu', 'exitMenu');
       },
 
       exitPreview: function() {

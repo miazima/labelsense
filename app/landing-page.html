@@ -8,20 +8,10 @@
 			:host {
 				display: block;
 			}
-      .tabs {
-        height: 100%;
-        @apply(--layout-horizontal);
-      }
-      .tabs > a {
-        @apply(--layout-vertical);
-        @apply(--layout-center-center);
-        margin: 12px 16px 12px;
-        border-bottom: 1px solid #222;
-      }
       header {
         @apply(--layout-vertical);
         @apply(--layout-center-center);
-        height: calc(100vh - 128px);
+        height: 100vh;
         padding: 0 16px;
         background-color: var(--paper-blue-grey-900);
 				background-image: radial-gradient(closest-side, transparent 98%, rgba(0,0,0,.02) 99%),
@@ -42,16 +32,12 @@
       section {
         padding: 88px 16px;
       }
-			.border {
-				height: 64px;
-				background-color: var(--paper-blue-grey-50);
-			}
-			paper-button.teal-accent-btn { padding: 12px 24px; }
+			paper-button.primary-btn { 
+				background: var(--paper-amber-700);
+				padding: 12px 24px;
+		 }
 			div#signin {
 				padding: 20px ;
-			}
-			.teal-accent-btn#signinbtn {
-				background: var(--paper-teal-400);
 			}
 		</style>
 
@@ -60,15 +46,13 @@
 			admin="[[admin]]">
     </api-signin>
 
-		<div class="border"></div>
     <header id="landing">
       <h2>Welcome To LabelSense</h2>
       <div id="signin">
-      	<paper-button id="signinbtn" class="teal-accent-btn" on-tap="login" raised>Sign in</paper-button>
+      	<paper-button id="signinbtn" class="primary-btn" on-tap="login" raised>Sign in</paper-button>
       </div>
     </header>
 
-    <div class="border"></div>
 
 	</template>
 	<script>
